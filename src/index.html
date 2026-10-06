@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>AIIP — Heart Rhythm Classifier</title>
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+	<header class="app-header">
+		<div>
+			<p class="eyebrow">AIIP · Lab 1 · Variant 6</p>
+			<h1>Heart Rhythm Classifier</h1>
+			<p class="subtitle">Bradycardia · Normal sinus rhythm · Tachycardia</p>
+		</div>
+		<div class="header-actions">
+			<button type="button" id="help-button" class="icon-button" aria-label="Help">?</button>
+			<button type="button" id="info-button" class="icon-button" aria-label="Info">&#9432;</button>
+		</div>
+	</header>
+
+	<nav class="status-bar" aria-label="Progress overview">
+		<button type="button" id="status-data" class="status-badge" title="Go to Step 1">
+			<span class="status-dot" data-state="empty"></span>
+			<span class="status-name">Data</span>
+			<span class="status-summary">not generated</span>
+		</button>
+		<button type="button" id="status-model" class="status-badge" title="Go to Step 2">
+			<span class="status-dot" data-state="empty"></span>
+			<span class="status-name">Model</span>
+			<span class="status-summary">not trained</span>
+		</button>
+		<button type="button" id="status-recognize" class="status-badge" title="Go to Step 3">
+			<span class="status-dot" data-state="empty"></span>
+			<span class="status-name">Recognition</span>
+			<span class="status-summary">no result yet</span>
+		</button>
+	</nav>
+
+	<div class="app-layout">
+		<main class="steps">
+
+			<section class="card" id="data-card" aria-labelledby="data-title">
+				<div class="card-header">
+					<h2 id="data-title">Generate dataset</h2>
+				</div>
+				<div class="card-body">
+					<form class="params" id="data-form" novalidate>
+						<div class="field-row">
+							<label for="data-per-class">Sequences per class</label>
+							<input type="number" id="data-per-class" min="10" max="5000" value="334">
+						</div>
+						<div class="field-row">
+							<label for="data-k">Values per sequence (K)</label>
+							<input type="number" id="data-k" min="3" max="12" value="4">
+						</div>
+						<div class="field-row">
+							<label for="data-tol">Tolerance, BPM</label>
+							<input type="number" id="data-tol" min="0" max="20" value="4" step="0.5">
+						</div>
+						<div class="field-row">
+							<label for="data-test-pct">Test split, %</label>
+							<input type="number" id="data-test-pct" min="5" max="50" value="20">
+						</div>
+						<div class="field-row">
+							<label for="data-seed">Seed <span class="optional">(blank = random)</span></label>
+							<input type="number" id="data-seed" min="0" placeholder="random">
+						</div>
+						<fieldset class="ranges">
+							<legend>Ranges, BPM (min · max)</legend>
+							<div class="range-grid">
+								<span class="range-label class-normal">Normal</span>
+								<input type="number" id="range-normal-min" value="60" aria-label="Normal min">
+								<input type="number" id="range-normal-max" value="100" aria-label="Normal max">
+								<span class="range-label class-tachycardia">Tachycardia</span>
+								<input type="number" id="range-tachy-min" value="100" aria-label="Tachycardia min">
+								<input type="number" id="range-tachy-max" value="140" aria-label="Tachycardia max">
+								<span class="range-label class-bradycardia">Bradycardia</span>
+								<input type="number" id="range-brady-min" value="40" aria-label="Bradycardia min">
+								<input type="number" id="range-brady-max" value="60" aria-label="Bradycardia max">
+							</div>
+						</fieldset>
+						<div class="progress" role="progressbar" aria-label="Generation progress"
+							aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+							id="data-progress-wrap">
+							<div class="progress-fill" id="data-progress"></div>
+						</div>
+						<p class="progress-text" id="data-progress-text">idle</p>
+						<div class="button-row">
+							<button type="button" id="data-generate" class="primary">Generate</button>
+							<button type="button" id="data-save-csv" disabled>Save CSV</button>
+							<button type="button" id="data-save-json" disabled>Save JSON</button>
+							<button type="button" id="data-load-file">Load dataset&hellip;</button>
+							<input type="file" id="data-file-input" accept=".csv,.json" hidden>
+						</div>
+						<p class="hint" id="data-save-hint">Generate or load a dataset to enable saving</p>
+						<div class="errors" id="data-errors" role="alert" hidden></div>
+					</form>
+					<div class="results">
+						<div class="tiles" id="data-tiles" hidden></div>
+						<h3>Spread by class</h3>
+						<div class="placeholder" id="scatter-placeholder">
+							<span class="placeholder-icon">&#9636;</span>
+							<p>Scatter plot (mean &times; spread)<br>appears after generation</p>
+						</div>
+						<canvas id="scatter-canvas" hidden></canvas>
+						<h3>Sample sequences</h3>
+						<div class="placeholder" id="gallery-placeholder">
+							<span class="placeholder-icon">&#9636;</span>
+							<p>Gallery strips<br>appear after generation</p>
+						</div>
+						<canvas id="gallery-canvas" hidden></canvas>
+					</div>
+				</div>
+			</section>
+
+			<section class="card" id="train-card" aria-labelledby="train-title">
+				<div class="card-header">
+					<h2 id="train-title">Train model</h2>
+				</div>
+				<div class="card-body">
+					<form class="params" id="train-form" novalidate>
+						<div class="field-row">
+							<label for="train-epochs">Epochs</label>
+							<input type="number" id="train-epochs" min="1" max="20000" value="1000">
+						</div>
+						<div class="field-row">
+							<label for="train-error-thresh">Early stop, error <span class="optional">(blank = off)</span></label>
+							<input type="number" id="train-error-thresh" min="0" max="0.5" step="0.01" placeholder="off">
+						</div>
+						<div class="field-row">
+							<label for="train-learning-rate">Learning rate</label>
+							<input type="number" id="train-learning-rate" min="0" max="1" step="0.01" value="0.3" disabled>
+						</div>
+						<div class="field-row">
+							<label for="train-momentum">Momentum</label>
+							<input type="number" id="train-momentum" min="0" max="1" step="0.01" value="0.1" disabled>
+						</div>
+						<div class="field-row">
+							<label for="train-hidden">Hidden neurons</label>
+							<input type="number" id="train-hidden" min="1" max="64" value="8" disabled>
+						</div>
+						<p class="hint" id="train-ann-hint">Learning rate, momentum and hidden neurons are active after Brain.js integration (lab&nbsp;2)</p>
+						<div class="progress" role="progressbar" aria-label="Training progress"
+							aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+							id="train-progress-wrap">
+							<div class="progress-fill" id="train-progress"></div>
+						</div>
+						<p class="progress-text" id="train-progress-text">idle</p>
+						<div class="button-row">
+							<button type="button" id="train-start" class="primary" disabled>Train</button>
+							<button type="button" id="train-stop" disabled>Stop</button>
+							<button type="button" id="model-save" disabled>Save model</button>
+							<button type="button" id="model-load">Load model&hellip;</button>
+							<input type="file" id="model-file-input" accept=".json" hidden>
+						</div>
+						<p class="hint" id="train-start-hint">Generate a dataset first</p>
+						<div class="errors" id="train-errors" role="alert" hidden></div>
+					</form>
+					<div class="results">
+						<div class="model-summary" id="model-summary" hidden></div>
+						<h3>Confusion matrix</h3>
+						<div class="table-wrap" id="confusion-table" hidden></div>
+						<h3>Metrics</h3>
+						<ul class="metrics-list" id="metrics-list" hidden></ul>
+						<h3>Misclassified windows <span class="optional">(first 20)</span></h3>
+						<ol class="misclassified-list" id="misclassified-list" hidden></ol>
+						<h3>Error per epoch</h3>
+						<div class="placeholder" id="error-curve-placeholder">
+							<span class="placeholder-icon">&#9636;</span>
+							<p>Error curve appears after training</p>
+						</div>
+						<canvas id="error-canvas" hidden></canvas>
+						<h3>Accuracy per epoch</h3>
+						<canvas id="acc-canvas" hidden></canvas>
+					</div>
+				</div>
+			</section>
+
+			<section class="card" id="recognize-card" aria-labelledby="recognize-title">
+				<div class="card-header">
+					<h2 id="recognize-title">Recognize rhythm</h2>
+				</div>
+				<div class="card-body">
+					<form class="params" id="recognize-form" novalidate>
+						<div class="field-row">
+							<label for="recognize-input">Sequence, BPM values</label>
+							<textarea id="recognize-input" rows="4"
+								placeholder="e.g. 72, 68, 75, 71, 69, 73, 70, 68, 74"></textarea>
+						</div>
+						<div class="field-row">
+							<label for="unit-select">Input unit</label>
+							<select id="unit-select">
+								<option value="bpm" selected>BPM</option>
+								<option value="rrms">RR, ms</option>
+							</select>
+						</div>
+						<div class="progress" role="progressbar" aria-label="Recognition progress"
+							aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+							id="recognize-progress-wrap" hidden>
+							<div class="progress-fill" id="recognize-progress"></div>
+						</div>
+						<p class="progress-text" id="recognize-progress-text" hidden>idle</p>
+						<div class="button-row">
+							<button type="button" id="recognize-run" class="primary" disabled>Recognize</button>
+						</div>
+						<p class="hint" id="recognize-run-hint">Train or load a model first</p>
+						<div class="examples">
+							<span class="examples-label">Examples:</span>
+							<button type="button" id="example-normal" class="chip class-normal-border" disabled>Normal</button>
+							<button type="button" id="example-tachy" class="chip class-tachycardia-border" disabled>Tachycardia</button>
+							<button type="button" id="example-brady" class="chip class-bradycardia-border" disabled>Bradycardia</button>
+							<button type="button" id="example-random" class="chip" disabled>Random</button>
+						</div>
+						<div class="button-row">
+							<button type="button" id="recognize-file">Load sequence&hellip;</button>
+							<input type="file" id="recognize-file-input" accept=".txt,.csv" hidden>
+						</div>
+						<div class="errors" id="recognize-errors" role="alert" hidden></div>
+						<div class="warnings" id="recognize-warnings" hidden></div>
+					</form>
+					<div class="results">
+						<div class="result-panel" id="recognize-result" hidden aria-live="polite"></div>
+						<h3>Window details</h3>
+						<div class="table-wrap" id="window-table" hidden></div>
+						<h3>Result image</h3>
+						<div class="placeholder" id="result-placeholder">
+							<span class="placeholder-icon">&#9636;</span>
+							<p>ECG strip and RR histogram<br>appear after recognition</p>
+						</div>
+						<canvas id="result-canvas" width="1400" height="800" hidden></canvas>
+						<div class="button-row">
+							<button type="button" id="save-png" disabled>Save PNG</button>
+							<button type="button" id="save-jpg" disabled>Save JPG</button>
+							<button type="button" id="save-bmp" disabled>Save BMP</button>
+							<button type="button" id="save-txt" disabled>Save TXT</button>
+						</div>
+						<p class="hint" id="save-hint">Run a recognition to enable saving</p>
+					</div>
+				</div>
+			</section>
+
+		</main>
+
+		<aside class="log-panel" id="log-panel" aria-label="Operations log">
+			<div class="log-header">
+				<h2>Log</h2>
+				<span class="log-count" id="log-count">0</span>
+			</div>
+			<ol class="log-list" id="log-list" role="log" aria-live="polite"></ol>
+			<div class="log-actions">
+				<button type="button" id="log-save-button">Save log</button>
+				<button type="button" id="log-clear-button">Clear</button>
+			</div>
+		</aside>
+	</div>
+
+	<footer class="app-footer">
+		<p>Offline single-page app &middot; no server, no build step &middot; open <code>src/index.html</code> or run <code>./start.sh</code></p>
+	</footer>
+
+	<div class="modal" id="info-modal" role="dialog" aria-modal="true" aria-labelledby="info-title" hidden>
+		<div class="modal-card">
+			<div class="modal-header">
+				<h2 id="info-title">Info</h2>
+				<button type="button" class="icon-button" id="info-close" aria-label="Close">&#10005;</button>
+			</div>
+			<div class="modal-body" id="info-content"></div>
+		</div>
+	</div>
+
+	<div class="modal" id="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
+		<div class="modal-card">
+			<div class="modal-header">
+				<h2 id="help-title">Help</h2>
+				<button type="button" class="icon-button" id="help-close" aria-label="Close">&#10005;</button>
+			</div>
+			<div class="modal-body">
+				<h3>Workflow</h3>
+				<ol>
+					<li><strong>Generate dataset</strong> — sequences per formula (4): <code>Tmax = random(min&hellip;max)</code>, <code>Tmin = Tmax &minus; random(tol)</code>, each of K values picks <code>Tmax</code> or <code>Tmin</code>. Stratified 80/20 train/test split.</li>
+					<li><strong>Train model</strong> — threshold sweep: each epoch scans a 5&times;5 grid of (low, high) BPM boundaries, keeps the best, shrinks the search box. Error = 1 &minus; best accuracy. Brain.js replaces this engine in lab&nbsp;2 behind the same interface.</li>
+					<li><strong>Recognize rhythm</strong> — any sequence &ge; K values, sliding window of K with step 1, probabilities averaged over windows. Values convert between BPM and RR (ms) via <code>60000&nbsp;/&nbsp;RR</code>.</li>
+				</ol>
+				<h3>Class ranges, BPM</h3>
+				<ul class="help-ranges">
+					<li><span class="dot class-normal"></span> Normal: 60&ndash;100</li>
+					<li><span class="dot class-tachycardia"></span> Tachycardia: 100&ndash;140</li>
+					<li><span class="dot class-bradycardia"></span> Bradycardia: 40&ndash;60</li>
+				</ul>
+				<h3>Limits</h3>
+				<ul>
+					<li>Sequence length for recognition: K to 200 values</li>
+					<li>BPM accepted: 20&ndash;300; RR accepted: 200&ndash;3000 ms</li>
+					<li>File loads: dataset <code>.csv</code>/<code>.json</code>, sequence <code>.txt</code>/<code>.csv</code>, model <code>.json</code></li>
+					<li>Engine: threshold heuristic (Brain.js integration lands in lab&nbsp;2)</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<script src="js/util.js"></script>
+	<script src="js/rng.js"></script>
+	<script src="js/logger.js"></script>
+	<script src="js/generator.js"></script>
+	<script src="js/model.js"></script>
+	<script src="js/charts.js"></script>
+	<script src="js/ecg-render.js"></script>
+	<script src="js/image-export.js"></script>
+	<script src="js/data-step.js"></script>
+	<script src="js/train-step.js"></script>
+	<script src="js/recognize-step.js"></script>
+	<script src="js/app.js"></script>
+</body>
+</html>
