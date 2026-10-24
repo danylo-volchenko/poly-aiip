@@ -51,6 +51,15 @@
 		const thresh = el("train-error-thresh").value.trim();
 		if (thresh !== "" && (!isFinite(+thresh) || +thresh < 0 || +thresh > 0.5))
 			errors.push("early stop error must be a number in 0..0.5 or blank");
+		const lr = el("train-learning-rate").value.trim();
+		if (lr === "" || !isFinite(+lr) || +lr <= 0 || +lr >= 1)
+			errors.push("learning rate must be a number greater than 0 and less than 1");
+		const momentum = el("train-momentum").value.trim();
+		if (momentum === "" || !isFinite(+momentum) || +momentum <= 0 || +momentum >= 1)
+			errors.push("momentum must be a number greater than 0 and less than 1");
+		const hidden = el("train-hidden").value.trim();
+		if (!/^\d+$/.test(hidden) || +hidden < 1 || +hidden > 64)
+			errors.push("hidden neurons must be an integer in 1..64");
 		return errors;
 	}
 
@@ -77,9 +86,10 @@
 			}
 			box.appendChild(t);
 		};
-		add("engine", "threshold", model.source === "file" ? "loaded from file" : "sweep trained");
-		add("boundaries", u.fmtFixed(model.boundaries.low, 1) + " / " +
-			u.fmtFixed(model.boundaries.high, 1), "low / high, BPM");
+		add("engine", "brain.js", model.source === "file" ? "loaded from file" : "neural network");
+		add("hidden neurons", String(model.hidden), "one hidden layer");
+		add("learning rate", u.fmtFixed(model.learningRate, 2),
+			"momentum " + u.fmtFixed(model.momentum, 2));
 		add("window K", String(model.k));
 		add("epochs done", String(model.history.epoch.length || 0));
 		const lastTrainAcc = model.history.trainAcc.length
@@ -213,6 +223,9 @@
 		const epochs = +el("train-epochs").value;
 		const threshRaw = el("train-error-thresh").value.trim();
 		const errorThresh = threshRaw === "" ? 0 : +threshRaw;
+		const learningRate = +el("train-learning-rate").value;
+		const momentum = +el("train-momentum").value;
+		const hidden = Math.round(+el("train-hidden").value);
 
 		const encoding = AIIP.RhythmModel.encodingFor(d.samples);
 		const model = new AIIP.RhythmModel({ k: d.meta.k, encoding });
@@ -232,12 +245,15 @@
 		const t0 = performance.now();
 
 		try {
-			await model.train(d.train, d.test, { epochs, errorThresh }, {
+			await model.train(d.train, d.test,
+				{ epochs, errorThresh, learningRate, momentum, hidden }, {
 				onEpoch(h) {
+					const accText = h.trainAcc !== null && h.trainAcc !== undefined
+						? " \u00b7 train " + u.fmtFixed(h.trainAcc * 100, 1) + "%"
+						: "";
 					setProgress(h.epoch / epochs * 100,
 						"epoch " + h.epoch + "/" + epochs +
-						" \u00b7 error " + u.fmtFixed(h.error, 4) +
-						" \u00b7 train " + u.fmtFixed(h.trainAcc * 100, 1) + "%",
+						" \u00b7 error " + u.fmtFixed(h.error, 4) + accText,
 						stopRequested);
 					if (h.epoch % evalEvery === 0 || h.epoch === epochs)
 						renderCharts(model);
@@ -271,10 +287,10 @@
 			renderMetrics(ev);
 			renderCharts(model);
 			logger().success("model trained: " + last + " epochs in " + ms +
-				" ms, test accuracy " + u.fmtFixed(ev.accuracy * 100, 1) + "%");
+				" ms (" + (model.trainPath || "main-thread") + "), test accuracy " +
+				u.fmtFixed(ev.accuracy * 100, 1) + "%");
 			ctx.setStatus("model", "done",
-				"threshold \u00b7 " + u.fmtFixed(model.boundaries.low, 0) + "/" +
-				u.fmtFixed(model.boundaries.high, 0) + " BPM \u00b7 " +
+				"brain.js \u00b7 hidden " + model.hidden + " \u00b7 " +
 				u.fmtFixed(ev.accuracy * 100, 1) + "%");
 			ctx.setStatus("recognize", "ready", "ready");
 		} catch (e) {
@@ -340,11 +356,10 @@
 			}
 			renderCharts(model);
 			logger().success("model loaded: K=" + model.k +
-				", boundaries " + u.fmtFixed(model.boundaries.low, 1) +
-				"/" + u.fmtFixed(model.boundaries.high, 1));
+				", hidden " + model.hidden +
+				", learning rate " + u.fmtFixed(model.learningRate, 2));
 			ctx.setStatus("model", "done",
-				"threshold \u00b7 " + u.fmtFixed(model.boundaries.low, 0) + "/" +
-				u.fmtFixed(model.boundaries.high, 0) + " BPM \u00b7 file");
+				"brain.js \u00b7 hidden " + model.hidden + " \u00b7 file");
 			ctx.setStatus("recognize", "ready", "ready");
 		} catch (e) {
 			showErrors(["model load failed: " + e.message]);
@@ -376,7 +391,7 @@
 			const model = ctx.state.model;
 			if (!model)
 				return;
-			const name = "ecg_model_K" + model.k + "-thr_" + u.timestamp() + ".json";
+			const name = "ecg_model_K" + model.k + "-nn_" + u.timestamp() + ".json";
 			const r = AIIP.imageExport.saveText(JSON.stringify(model.toJSON(), null, 2), name);
 			ctx.state.lastSave = r;
 			logger().success("model saved: " + r.name + " (" + u.fmtBytes(r.size) + ")");

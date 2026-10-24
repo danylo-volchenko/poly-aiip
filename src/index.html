@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>AIIP — Heart Rhythm Classifier</title>
+	<title>AIIP - Heart Rhythm Classifier</title>
 	<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -45,7 +45,7 @@
 
 			<section class="card" id="data-card" aria-labelledby="data-title">
 				<div class="card-header">
-					<h2 id="data-title">Step 1 — Generate dataset</h2>
+					<h2 id="data-title">Step 1 - Generate dataset</h2>
 				</div>
 				<div class="card-body">
 					<form class="params" id="data-form" novalidate>
@@ -119,7 +119,7 @@
 
 			<section class="card" id="train-card" aria-labelledby="train-title">
 				<div class="card-header">
-					<h2 id="train-title">Step 2 — Train model</h2>
+					<h2 id="train-title">Step 2 - Train model</h2>
 				</div>
 				<div class="card-body">
 					<form class="params" id="train-form" novalidate>
@@ -133,17 +133,17 @@
 						</div>
 						<div class="field-row">
 							<label for="train-learning-rate">Learning rate</label>
-							<input type="number" id="train-learning-rate" min="0" max="1" step="0.01" value="0.3" disabled>
+							<input type="number" id="train-learning-rate" min="0.01" max="0.99" step="0.01" value="0.3">
 						</div>
 						<div class="field-row">
 							<label for="train-momentum">Momentum</label>
-							<input type="number" id="train-momentum" min="0" max="1" step="0.01" value="0.1" disabled>
+							<input type="number" id="train-momentum" min="0.01" max="0.99" step="0.01" value="0.1">
 						</div>
 						<div class="field-row">
 							<label for="train-hidden">Hidden neurons</label>
-							<input type="number" id="train-hidden" min="1" max="64" value="8" disabled>
+							<input type="number" id="train-hidden" min="1" max="64" value="8">
 						</div>
-						<p class="hint" id="train-ann-hint">Learning rate, momentum and hidden neurons are active after Brain.js integration (lab&nbsp;2)</p>
+						<p class="hint" id="train-ann-hint">Learning rate, momentum and hidden neurons configure the Brain.js network</p>
 						<div class="progress" role="progressbar" aria-label="Training progress"
 							aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
 							id="train-progress-wrap">
@@ -182,7 +182,7 @@
 
 			<section class="card" id="recognize-card" aria-labelledby="recognize-title">
 				<div class="card-header">
-					<h2 id="recognize-title">Step 3 — Recognize rhythm</h2>
+					<h2 id="recognize-title">Step 3 - Recognize rhythm</h2>
 				</div>
 				<div class="card-body">
 					<form class="params" id="recognize-form" novalidate>
@@ -281,9 +281,9 @@
 			<div class="modal-body">
 				<h3>Workflow</h3>
 				<ol>
-					<li><strong>Generate dataset</strong> — sequences per formula (4): <code>Tmax = random(min&hellip;max)</code>, <code>Tmin = Tmax &minus; random(tol)</code>, each of K values picks <code>Tmax</code> or <code>Tmin</code>. Stratified 80/20 train/test split.</li>
-					<li><strong>Train model</strong> — threshold sweep: each epoch scans a 5&times;5 grid of (low, high) BPM boundaries, keeps the best, shrinks the search box. Error = 1 &minus; best accuracy. Brain.js replaces this engine in lab&nbsp;2 behind the same interface.</li>
-					<li><strong>Recognize rhythm</strong> — any sequence &ge; K values, sliding window of K with step 1, probabilities averaged over windows. Values convert between BPM and RR (ms) via <code>60000&nbsp;/&nbsp;RR</code>.</li>
+					<li><strong>Generate dataset</strong> - sequences per formula (4): <code>Tmax = random(min&hellip;max)</code>, <code>Tmin = Tmax &minus; random(tol)</code>, each of K values picks <code>Tmax</code> or <code>Tmin</code>. Stratified 80/20 train/test split.</li>
+					<li><strong>Train model</strong> - a Brain.js feed-forward network (K inputs, one hidden layer, 3 outputs) is trained inside a Web Worker, one epoch per iteration. Learning rate, momentum and hidden neurons configure the network; early stop halts when the training error drops below the threshold. If the Worker cannot start, training falls back to the main thread.</li>
+					<li><strong>Recognize rhythm</strong> - any sequence &ge; K values, sliding window of K with step 1, probabilities averaged over windows. Values convert between BPM and RR (ms) via <code>60000&nbsp;/&nbsp;RR</code>.</li>
 				</ol>
 				<h3>Class ranges, BPM</h3>
 				<ul class="help-ranges">
@@ -296,17 +296,20 @@
 					<li>Sequence length for recognition: K to 200 values</li>
 					<li>BPM accepted: 20&ndash;300; RR accepted: 200&ndash;3000 ms</li>
 					<li>File loads: dataset <code>.csv</code>/<code>.json</code>, sequence <code>.txt</code>/<code>.csv</code>, model <code>.json</code></li>
-					<li>Engine: threshold heuristic (Brain.js integration lands in lab&nbsp;2)</li>
+					<li>Engine: Brain.js 2.0.0-beta.24 feed-forward neural network (trained in a Web Worker, main-thread fallback)</li>
 				</ul>
 			</div>
 		</div>
 	</div>
 
+	<script src="lib/brain.js"></script>
+	<script src="lib/brain-src.js"></script>
 	<script src="js/util.js"></script>
 	<script src="js/rng.js"></script>
 	<script src="js/logger.js"></script>
 	<script src="js/generator.js"></script>
 	<script src="js/model.js"></script>
+	<script src="js/train-worker.js"></script>
 	<script src="js/charts.js"></script>
 	<script src="js/ecg-render.js"></script>
 	<script src="js/image-export.js"></script>

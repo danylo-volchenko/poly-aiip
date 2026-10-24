@@ -5,6 +5,7 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 const srcDir = path.join(__dirname, "..", "src", "js");
+const libDir = path.join(__dirname, "..", "src", "lib");
 
 let pass = 0;
 let fail = 0;
@@ -21,7 +22,10 @@ function load(mods)
 	};
 	vm.createContext(ctx);
 	for (const m of mods) {
-		const code = fs.readFileSync(path.join(srcDir, m), "utf8");
+		const file = m.startsWith("lib/")
+			? path.join(libDir, m.slice(4))
+			: path.join(srcDir, m);
+		const code = fs.readFileSync(file, "utf8");
 		vm.runInContext(code, ctx, { filename: m });
 	}
 	return ctx.window.AIIP;

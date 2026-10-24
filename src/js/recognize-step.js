@@ -86,7 +86,7 @@
 
 		const conf = document.createElement("div");
 		conf.className = "result-confidence";
-		conf.textContent = "confidence " + u.fmtFixed(rec.confidence * 100, 1) + "%" +
+		conf.textContent = "confidence " + u.fmtFixed(rec.confidence * 100, 2) + "%" +
 			" \u00b7 " + rec.windows + " windows \u00b7 " + rec.bpm.length +
 			" values (" + (unit === "bpm" ? "BPM" : "RR ms") + " input)";
 		panel.appendChild(conf);
@@ -107,7 +107,7 @@
 			fill.style.background = c.color;
 			track.appendChild(fill);
 			const val = document.createElement("span");
-			val.textContent = u.fmtFixed(rec.probs[i] * 100, 1) + "%";
+			val.textContent = u.fmtFixed(rec.probs[i] * 100, 2) + "%";
 			row.appendChild(name);
 			row.appendChild(track);
 			row.appendChild(val);
@@ -139,7 +139,7 @@
 				vals,
 				u.fmtFixed(mean, 1),
 				w.label,
-				u.fmtFixed(w.confidence * 100, 1) + "%",
+				u.fmtFixed(w.confidence * 100, 2) + "%",
 			];
 			for (const c of cells) {
 				const td = document.createElement("td");
@@ -163,20 +163,21 @@
 		lines.push("input as BPM: " + rec.bpm.map((v) => u.fmtFixed(v, 1)).join(", "));
 		lines.push("");
 		lines.push("prediction: " + rec.label +
-			" (confidence " + u.fmtFixed(rec.confidence * 100, 1) + "%)");
+			" (confidence " + u.fmtFixed(rec.confidence * 100, 2) + "%)");
 		for (const c of AIIP.data.CLASSES)
-			lines.push("  P(" + c.key + ") = " + u.fmtFixed(rec.probs[rec.cls.indexOf(c.key)] * 100, 1) + "%");
+			lines.push("  P(" + c.key + ") = " + u.fmtFixed(rec.probs[rec.cls.indexOf(c.key)] * 100, 2) + "%");
 		lines.push("windows: " + rec.windows + " (sliding K=" + rec.k + ", step 1)");
 		lines.push("");
 		lines.push("per-window predictions:");
 		rec.perWindow.forEach((w, i) => {
 			lines.push("  window " + (i + 1) + ": " + w.label +
-				" (" + u.fmtFixed(w.confidence * 100, 1) + "%)");
+				" (" + u.fmtFixed(w.confidence * 100, 2) + "%)");
 		});
 		lines.push("");
-		lines.push("model: threshold engine, K=" + model.k +
-			", boundaries low=" + u.fmtFixed(model.boundaries.low, 1) +
-			" high=" + u.fmtFixed(model.boundaries.high, 1) + " BPM" +
+		lines.push("model: brain.js, K=" + model.k +
+			", hidden " + model.hidden +
+			" (learning rate " + u.fmtFixed(model.learningRate, 2) +
+			", momentum " + u.fmtFixed(model.momentum, 2) + ")" +
 			", encoding " + model.encoding.min + ".." + model.encoding.max + " BPM");
 		if (warnings.length) {
 			lines.push("");
@@ -231,7 +232,7 @@
 			rec.cls = AIIP.data.CLASSES.map((c) => c.key);
 			if (rec.confidence < 0.5)
 				warnings.push("ambiguous sequence: averaged confidence " +
-					u.fmtFixed(rec.confidence * 100, 1) + "%");
+					u.fmtFixed(rec.confidence * 100, 2) + "%");
 
 			setProgress(fill, wrap, text, 60, "rendering result image\u2026");
 			await u.nextFrame();
@@ -247,19 +248,20 @@
 				confidence: rec.confidence,
 				windows: rec.windows,
 				perWindow: rec.perWindow,
-				boundaries: model.boundaries,
+				hidden: model.hidden,
+				encoding: model.encoding,
 			});
 			renderResultPanel(rec, unit);
 			renderWindowTable(rec);
 			showWarnings(warnings);
 			setProgress(fill, wrap, text, 100,
-				"done: " + rec.label + " \u00b7 " + u.fmtFixed(rec.confidence * 100, 1) + "%");
+				"done: " + rec.label + " \u00b7 " + u.fmtFixed(rec.confidence * 100, 2) + "%");
 
 			logger().success("recognized: " + rec.label +
-				" (" + u.fmtFixed(rec.confidence * 100, 1) + "% over " +
+				" (" + u.fmtFixed(rec.confidence * 100, 2) + "% over " +
 				rec.windows + " windows)");
 			ctx.setStatus("recognize", "done",
-				rec.label + " \u00b7 " + u.fmtFixed(rec.confidence * 100, 1) + "%");
+				rec.label + " \u00b7 " + u.fmtFixed(rec.confidence * 100, 2) + "%");
 		} catch (e) {
 			showErrors(["recognition failed: " + e.message]);
 			logger().error("recognition failed: " + e.message);
@@ -460,7 +462,7 @@
 				}
 			if (rec.confidence < 0.5)
 				warnings.push("ambiguous sequence: confidence " +
-					u.fmtFixed(rec.confidence * 100, 1) + "%");
+					u.fmtFixed(rec.confidence * 100, 2) + "%");
 			const name = "ecg_result_" + u.timestamp() + ".txt";
 			const text = buildResultText(rec, model, warnings, rec.unit || "bpm");
 			const r = AIIP.imageExport.saveText(text, name);

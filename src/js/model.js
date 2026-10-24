@@ -5,58 +5,97 @@
 	const AIIP = window.AIIP = window.AIIP || {};
 	const u = AIIP.util;
 
-	const TEMP = 5;
-	const GRID = 5;
-	const TIE = 1e-9;
-
-	function softmax(z)
-	{
-		const m = u.max(z);
-		const e = z.map((v) => Math.exp(v - m));
-		const s = e.reduce((a, b) => a + b, 0);
-		return e.map((v) => v / s);
-	}
-
-	function scoreByKey(b, mean)
-	{
-		return {
-			normal: 0,
-			tachycardia: (mean - b.high) / TEMP - TIE,
-			bradycardia: (b.low - mean) / TEMP - TIE,
-		};
-	}
-
-	function classifyKey(b, mean)
-	{
-		if (mean < b.low)
-			return "bradycardia";
-		if (mean > b.high)
-			return "tachycardia";
-		return "normal";
-	}
-
-	function linspace(a, b, n)
-	{
-		if (a === b)
-			return Array(n).fill(a);
-		const step = (b - a) / (n - 1);
-		return Array.from({ length: n }, (_, i) => a + i * step);
-	}
+	const ENGINE = "brain.js";
+	// Bundled version at vendoring time; detectEngineVersion() prefers the
+	// real version banner carried by the vendored bundle.
+	const ENGINE_VERSION = "2.0.0-beta.24";
+	const WORKER_IDLE_MS = 120000;
+	const DEFAULTS = { learningRate: 0.3, momentum: 0.1, hidden: 8 };
 
 	function now()
 	{
 		return typeof performance !== "undefined" && performance.now ? performance.now() : Date.now();
 	}
 
+	function emptyHistory()
+	{
+		return { epoch: [], error: [], evalEpoch: [], trainAcc: [], testAcc: [] };
+	}
+
+	function getBrain()
+	{
+		const g = typeof globalThis !== "undefined" ? globalThis : null;
+		const b = (g && g.brain) || (typeof window !== "undefined" ? window.brain : null);
+		if (!b || typeof b.NeuralNetwork !== "function")
+			throw new Error("brain.js is not loaded");
+		return b;
+	}
+
+	function getBrainSource()
+	{
+		return typeof window !== "undefined" && typeof window.__BRAIN_SOURCE__ === "string"
+			? window.__BRAIN_SOURCE__
+			: "";
+	}
+
+	// brain.js exports no version of its own, so read the banner comment of the
+	// vendored bundle; ENGINE_VERSION is only a fallback when no source is loaded.
+	function detectEngineVersion()
+	{
+		const g = typeof globalThis !== "undefined" ? globalThis : null;
+		const b = (g && g.brain) || (typeof window !== "undefined" ? window.brain : null);
+		if (b && typeof b.version === "string" && b.version)
+			return b.version;
+		const m = /brain\.js\s+v?([0-9][\w.\-]*)/.exec(getBrainSource());
+		return m ? m[1] : ENGINE_VERSION;
+	}
+
+	function oneHot(label)
+	{
+		const out = {};
+		for (const c of AIIP.data.CLASSES)
+			out[c.key] = c.key === label ? 1 : 0;
+		return out;
+	}
+
+	function encodeSet(set, model)
+	{
+		const rows = set.map((s) => ({
+			input: s.bpm.map((v) => model.encode(v)),
+			output: oneHot(s.label),
+		}));
+		const labels = set.map((s) => AIIP.data.CLASSES.findIndex((c) => c.key === s.label));
+		return { rows, labels };
+	}
+
+	function accuracyOf(net, set, keys)
+	{
+		if (!net || !set || !set.rows.length)
+			return null;
+		let hits = 0;
+		for (let i = 0; i < set.rows.length; i++) {
+			const out = net.run(set.rows[i].input);
+			const vals = Array.isArray(out) ? out : keys.map((k) => out[k] || 0);
+			if (u.argmax(vals) === set.labels[i])
+				hits++;
+		}
+		return hits / set.rows.length;
+	}
+
 	class RhythmModel
 	{
 		constructor(opts)
 		{
-			this.k = opts && opts.k;
-			this.boundaries = (opts && opts.boundaries) || { low: 60, high: 100 };
-			this.encoding = (opts && opts.encoding) || { min: 30, max: 150 };
-			this.history = { epoch: [], error: [], evalEpoch: [], trainAcc: [], testAcc: [] };
+			opts = opts || {};
+			this.k = opts.k;
+			this.encoding = opts.encoding || { min: 30, max: 150 };
+			this.hidden = opts.hidden || DEFAULTS.hidden;
+			this.learningRate = opts.learningRate || DEFAULTS.learningRate;
+			this.momentum = Number.isFinite(opts.momentum) ? opts.momentum : DEFAULTS.momentum;
+			this.net = null;
+			this.history = emptyHistory();
 			this.source = "trained";
+			this.trainPath = null;
 			this.trainSize = 0;
 			this.testSize = 0;
 			this.trainedAt = null;
@@ -72,10 +111,18 @@
 		{
 			if (!bpm || !bpm.length)
 				throw new Error("empty window");
+			if (!this.net)
+				throw new Error("model is not trained");
 			const classes = AIIP.data.CLASSES;
-			const m = u.mean(bpm);
-			const scores = scoreByKey(this.boundaries, m);
-			const probs = softmax(classes.map((c) => scores[c.key]));
+			const out = this.net.run(bpm.map((v) => this.encode(v)));
+			const raw = Array.isArray(out)
+				? classes.map((c, i) => Number(out[i]) || 0)
+				: classes.map((c) => Number(out[c.key]) || 0);
+			// brain.js's output layer is sigmoid, so `raw` is already per-class
+			// confidence in (0,1). L1-normalise to a distribution; softmax here
+			// would double-squash and collapse the winner to ~0.5.
+			const total = raw.reduce((a, b) => a + b, 0);
+			const probs = total > 0 ? raw.map((v) => v / total) : raw;
 			const index = u.argmax(probs);
 			return {
 				probs,
@@ -123,90 +170,141 @@
 			return hits / samples.length;
 		}
 
-		accuracyWith(b, samples)
+		recordProgress(msg)
 		{
-			if (!samples.length)
-				return 0;
-			let hits = 0;
-			for (const s of samples) {
-				if (classifyKey(b, u.mean(s.bpm)) === s.label)
-					hits++;
+			this.history.epoch.push(msg.epoch);
+			this.history.error.push(msg.error);
+			if (msg.trainAcc !== null && msg.trainAcc !== undefined) {
+				this.history.evalEpoch.push(msg.epoch);
+				this.history.trainAcc.push(msg.trainAcc);
+				this.history.testAcc.push(msg.testAcc);
 			}
-			return hits / samples.length;
 		}
 
-		classMeans(trainSet)
+		trainInWorker(data, config, evalEvery, hooks)
 		{
-			const means = {};
-			for (const c of AIIP.data.CLASSES) {
-				const vals = trainSet.filter((s) => s.label === c.key).flatMap((s) => s.bpm);
-				means[c.key] = vals.length ? u.mean(vals) : null;
-			}
-			return means;
-		}
+			const g = typeof globalThis !== "undefined" ? globalThis : null;
+			const WorkerCtor = (g && g.Worker) || (typeof window !== "undefined" && window.Worker) || null;
+			const main = AIIP.trainWorkerMain;
+			const source = getBrainSource();
+			if (typeof WorkerCtor !== "function" || typeof main !== "function" || !source ||
+				typeof Blob !== "function" || typeof URL === "undefined" || !URL.createObjectURL)
+				return null;
 
-		initBoxes(trainSet)
-		{
-			const m = this.classMeans(trainSet);
-			const low = m.bradycardia !== null && m.normal !== null && m.bradycardia < m.normal
-				? [m.bradycardia, m.normal] : [40, 70];
-			const high = m.normal !== null && m.tachycardia !== null && m.normal < m.tachycardia
-				? [m.normal, m.tachycardia] : [90, 140];
-			return { low, high };
-		}
-
-		async train(trainSet, testSet, opts, hooks)
-		{
-			const epochs = opts.epochs;
-			const errorThresh = opts.errorThresh || 0;
-			hooks = hooks || {};
-			this.history = { epoch: [], error: [], evalEpoch: [], trainAcc: [], testAcc: [] };
-			this.trainSize = trainSet.length;
-			this.testSize = testSet.length;
-
-			let boxes = this.initBoxes(trainSet);
-			const evalEvery = Math.max(1, Math.round(epochs / 100));
-			let lastYield = now();
-
-			for (let e = 1; e <= epochs; e++) {
-				let best = null;
-				for (const low of linspace(boxes.low[0], boxes.low[1], GRID)) {
-					for (const high of linspace(boxes.high[0], boxes.high[1], GRID)) {
-						const acc = this.accuracyWith({ low, high }, trainSet);
-						if (!best || acc > best.acc)
-							best = { low, high, acc };
+			let worker = null;
+			let url = null;
+			try {
+				const src = source + "\n;(" + main.toString() + ")();\n";
+				url = URL.createObjectURL(new Blob([src], { type: "text/javascript" }));
+				worker = new WorkerCtor(url);
+			} catch (e) {
+				if (url) {
+					try {
+						URL.revokeObjectURL(url);
+					} catch (ignored) {
+						url = null;
 					}
 				}
+				return null;
+			}
 
-				this.boundaries = { low: best.low, high: best.high };
-				const error = 1 - best.acc;
-				const isEval = e === 1 || e % evalEvery === 0 || e === epochs;
-				let testAcc = null;
-				if (isEval) {
-					testAcc = this.accuracyWith(this.boundaries, testSet);
-					this.history.evalEpoch.push(e);
-					this.history.testAcc.push(testAcc);
+			return new Promise((resolve) => {
+				let settled = false;
+				let idle = null;
+				const finish = (value) => {
+					if (settled)
+						return;
+					settled = true;
+					if (idle !== null)
+						clearTimeout(idle);
+					try {
+						worker.terminate();
+					} catch (ignored) {
+						worker = null;
+					}
+					try {
+						URL.revokeObjectURL(url);
+					} catch (ignored) {
+						url = null;
+					}
+					resolve(value);
+				};
+				// A worker killed without an event would otherwise leave the
+				// promise pending forever; time out and let the chunked
+				// main-thread path take over.
+				const bump = () => {
+					if (idle !== null)
+						clearTimeout(idle);
+					idle = setTimeout(() => finish(null), WORKER_IDLE_MS);
+				};
+
+				worker.onmessage = (ev) => {
+					bump();
+					const msg = ev.data || {};
+					if (msg.type === "progress") {
+						if (hooks.onEpoch)
+							hooks.onEpoch({
+								epoch: msg.epoch,
+								epochs: config.epochs,
+								error: msg.error,
+								trainAcc: msg.trainAcc,
+								testAcc: msg.testAcc,
+							});
+						if (hooks.shouldStop && hooks.shouldStop())
+							worker.postMessage({ type: "stop" });
+					} else if (msg.type === "done") {
+						finish(msg);
+					} else if (msg.type === "error") {
+						finish(null);
+					}
+				};
+				worker.onerror = () => finish(null);
+				worker.onmessageerror = () => finish(null);
+				bump();
+				try {
+					worker.postMessage({
+						type: "train",
+						data,
+						config,
+						evalEvery,
+						trainSize: this.trainSize,
+						testSize: this.testSize,
+					});
+				} catch (e) {
+					finish(null);
 				}
-				this.history.epoch.push(e);
-				this.history.error.push(error);
-				this.history.trainAcc.push(best.acc);
+			});
+		}
 
+		async trainChunked(data, config, evalEvery, hooks)
+		{
+			const net = this.net;
+			const trainOpts = {
+				iterations: 1,
+				learningRate: config.learningRate,
+				momentum: config.momentum,
+				log: false,
+			};
+			let lastYield = now();
+
+			for (let e = 1; e <= config.epochs; e++) {
+				const error = net.train(data.train.rows, trainOpts).error;
+				let trainAcc = null;
+				let testAcc = null;
+				if (e === 1 || e % evalEvery === 0 || e === config.epochs) {
+					trainAcc = accuracyOf(net, data.train, config.keys);
+					testAcc = accuracyOf(net, data.test, config.keys);
+				}
+				this.recordProgress({ epoch: e, error, trainAcc, testAcc });
 				if (hooks.onEpoch)
 					hooks.onEpoch({
 						epoch: e,
-						epochs,
+						epochs: config.epochs,
 						error,
-						trainAcc: best.acc,
+						trainAcc,
 						testAcc,
-						boundaries: this.boundaries,
 					});
-
-				boxes = {
-					low: shrinkBox(boxes.low, best.low),
-					high: shrinkBox(boxes.high, best.high),
-				};
-
-				if (errorThresh > 0 && error <= errorThresh)
+				if (config.errorThresh > 0 && error <= config.errorThresh)
 					break;
 				if (hooks.shouldStop && hooks.shouldStop())
 					break;
@@ -214,6 +312,59 @@
 					await u.nextFrame();
 					lastYield = now();
 				}
+			}
+		}
+
+		async train(trainSet, testSet, opts, hooks)
+		{
+			opts = opts || {};
+			hooks = hooks || {};
+			const brain = getBrain();
+
+			const epochs = Math.max(1, opts.epochs || 1);
+			const errorThresh = opts.errorThresh > 0 ? opts.errorThresh : 0;
+			this.hidden = Math.max(1, Math.round(opts.hidden || DEFAULTS.hidden));
+			this.learningRate = opts.learningRate > 0 ? opts.learningRate : DEFAULTS.learningRate;
+			this.momentum = Number.isFinite(opts.momentum) ? opts.momentum : DEFAULTS.momentum;
+			this.history = emptyHistory();
+			this.trainSize = trainSet.length;
+			this.testSize = testSet.length;
+			this.trainedAt = null;
+
+			const keys = AIIP.data.CLASSES.map((c) => c.key);
+			const layers = {
+				inputSize: this.k,
+				hiddenLayers: [this.hidden],
+				outputSize: keys.length,
+			};
+			const config = {
+				epochs,
+				errorThresh,
+				learningRate: this.learningRate,
+				momentum: this.momentum,
+				hidden: this.hidden,
+				layers,
+				keys,
+			};
+			const data = {
+				train: encodeSet(trainSet, this),
+				test: encodeSet(testSet, this),
+			};
+			const evalEvery = Math.max(1, Math.round(epochs / 100));
+
+			this.net = new brain.NeuralNetwork(layers);
+
+			const worker = this.trainInWorker(data, config, evalEvery, hooks);
+			const done = worker ? await worker : null;
+			if (done && done.netJSON) {
+				this.net.fromJSON(done.netJSON);
+				if (done.history)
+					this.history = done.history;
+				this.trainPath = "worker";
+			} else {
+				this.history = emptyHistory();
+				await this.trainChunked(data, config, evalEvery, hooks);
+				this.trainPath = "main-thread";
 			}
 
 			this.trainedAt = new Date().toISOString();
@@ -282,15 +433,18 @@
 		{
 			return {
 				format: "aiip-model",
-				version: 1,
-				engine: "threshold",
+				version: 2,
+				engine: ENGINE,
 				k: this.k,
-				boundaries: this.boundaries,
+				hidden: this.hidden,
+				learningRate: this.learningRate,
+				momentum: this.momentum,
 				encoding: this.encoding,
 				history: this.history,
 				trainSize: this.trainSize,
 				testSize: this.testSize,
 				trainedAt: this.trainedAt,
+				net: this.net ? this.net.toJSON() : null,
 			};
 		}
 
@@ -308,22 +462,27 @@
 		{
 			if (!obj || obj.format !== "aiip-model")
 				throw new Error("not an AIIP model file");
+			if (obj.version !== 2 || obj.engine !== ENGINE)
+				throw new Error("unsupported model version");
 			if (!Number.isInteger(obj.k) || obj.k < 1)
 				throw new Error("bad k");
-			const b = obj.boundaries;
-			if (!b || !Number.isFinite(b.low) || !Number.isFinite(b.high) || b.low >= b.high)
-				throw new Error("bad boundaries");
 			const e = obj.encoding;
 			if (!e || !Number.isFinite(e.min) || !Number.isFinite(e.max) || e.min >= e.max)
 				throw new Error("bad encoding");
+			if (!obj.net || typeof obj.net !== "object")
+				throw new Error("bad network");
 
 			const m = new RhythmModel({
 				k: obj.k,
-				boundaries: { low: b.low, high: b.high },
 				encoding: { min: e.min, max: e.max },
+				hidden: obj.hidden,
+				learningRate: obj.learningRate,
+				momentum: obj.momentum,
 			});
+			m.net = new (getBrain().NeuralNetwork)();
+			m.net.fromJSON(obj.net);
 			m.history = obj.history && Array.isArray(obj.history.epoch) ? obj.history
-				: { epoch: [], error: [], evalEpoch: [], trainAcc: [], testAcc: [] };
+				: emptyHistory();
 			m.trainSize = obj.trainSize || 0;
 			m.testSize = obj.testSize || 0;
 			m.trainedAt = obj.trainedAt || null;
@@ -332,11 +491,6 @@
 		}
 	}
 
-	function shrinkBox(box, best)
-	{
-		const step = (box[1] - box[0]) / 8;
-		return [Math.max(0, best - step), best + step];
-	}
-
 	AIIP.RhythmModel = RhythmModel;
+	AIIP.engine = { name: ENGINE, version: detectEngineVersion() };
 })();

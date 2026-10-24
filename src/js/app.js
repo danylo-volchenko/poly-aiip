@@ -91,10 +91,12 @@
 		if (s.model) {
 			const m = s.model;
 			kv(ms, [
-				["engine", "threshold (Brain.js in lab 2)"],
+				["engine", "brain.js (feed-forward neural network)"],
 				["source", m.source === "file" ? "loaded from file" : "trained"],
 				["window K", String(m.k)],
-				["boundaries", u.fmtFixed(m.boundaries.low, 1) + " / " + u.fmtFixed(m.boundaries.high, 1) + " BPM"],
+				["hidden neurons", String(m.hidden)],
+				["learning rate", u.fmtFixed(m.learningRate, 2)],
+				["momentum", u.fmtFixed(m.momentum, 2)],
 				["encoding", m.encoding.min + ".." + m.encoding.max + " BPM"],
 				["epochs done", String(m.history.epoch.length || 0)],
 				["test accuracy", m.lastEvaluation ? u.fmtFixed(m.lastEvaluation.accuracy * 100, 1) + "%" : "\u2014"],
@@ -145,8 +147,8 @@
 
 		const es = section("Environment");
 		kv(es, [
-			["model engine", "threshold sweep (Brain.js integration lands in lab 2)"],
-			["brain.js", "not integrated yet"],
+			["model engine", "brain.js " + (AIIP.engine ? AIIP.engine.version : "")],
+			["training", "Web Worker (blob URL) · main-thread fallback"],
 			["browser", navigator.userAgent.slice(0, 90) + "\u2026"],
 			["language", navigator.language],
 		]);
@@ -246,7 +248,8 @@
 						confidence: s.recognition.confidence,
 						windows: s.recognition.windows,
 						perWindow: s.recognition.perWindow,
-						boundaries: m.boundaries,
+						hidden: m.hidden,
+						encoding: m.encoding,
 					});
 				}
 			}, 150);
@@ -275,7 +278,7 @@
 			if (!ctx.state.dataset)
 				throw new Error("no dataset after generate");
 
-			document.getElementById("train-epochs").value = "50";
+			document.getElementById("train-epochs").value = "200";
 			document.getElementById("train-start").click();
 			tries = 0;
 			while ((!ctx.state.model || ctx.state.busy) && tries++ < 1200)
@@ -310,7 +313,7 @@
 				if (!document.getElementById(box).hidden)
 					throw new Error(box + " visible after clean run");
 			}
-			mark("APP-SMOKE: PASS - generate, train 50, chips: " + results.join(", "));
+			mark("APP-SMOKE: PASS - generate, train 200, chips: " + results.join(", "));
 		}
 
 		drive().catch((e) => {
@@ -329,7 +332,9 @@
 		initResize();
 		ctx.refresh();
 		AIIP.logger.info("AIIP ready \u2014 generate a dataset to start (step 1)");
-		AIIP.logger.info("engine: threshold sweep; Brain.js integration lands in lab 2");
+		AIIP.logger.info("engine: brain.js " +
+			(AIIP.engine ? AIIP.engine.version : "") +
+			" (neural network; Web Worker training, main-thread fallback)");
 		if (new URLSearchParams(location.search).get("appsmoke") === "1")
 			selfSmoke();
 	}

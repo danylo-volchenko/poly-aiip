@@ -127,7 +127,7 @@
 		ctx.fillStyle = MINOR === MINOR ? "#e58fb1" : "#e58fb1";
 		ctx.font = FONT;
 		ctx.textAlign = "left";
-		ctx.fillText("ECG strip — synthesized R spikes at given rates", strip.x, strip.y - 10);
+		ctx.fillText("ECG strip - synthesized R spikes at given rates", strip.x, strip.y - 10);
 
 		const hist = { x: strip.x, y: 520, w: strip.w, h: 230 };
 		ctx.fillStyle = BG;
@@ -174,7 +174,7 @@
 		ctx.fillStyle = "#aeb6bb";
 		ctx.font = FONT;
 		ctx.textAlign = "left";
-		ctx.fillText("RR interval histogram — bar height = interval, bar color = predicted class", strip.x, hist.y - 10);
+		ctx.fillText("RR interval histogram - bar height = interval, bar color = predicted class", strip.x, hist.y - 10);
 		ctx.save();
 		ctx.translate(hist.x - 10, hist.y + hist.h / 2);
 		ctx.rotate(-Math.PI / 2);
@@ -199,7 +199,7 @@
 		ctx.textAlign = "left";
 		ctx.fillStyle = classColor(data.label);
 		ctx.font = "bold 26px system-ui, sans-serif";
-		ctx.fillText(`Prediction: ${data.label}  ·  confidence ${u.fmtFixed(data.confidence * 100, 1)}%`, 40, 56);
+		ctx.fillText(`Prediction: ${data.label}  ·  confidence ${u.fmtFixed(data.confidence * 100, 2)}%`, 40, 56);
 		ctx.font = FONT;
 		ctx.fillStyle = "#aeb6bb";
 		let px = 40;
@@ -208,13 +208,13 @@
 			ctx.fillRect(px, 70, 12, 12);
 			ctx.fillStyle = "#aeb6bb";
 			ctx.textAlign = "left";
-			const text = `${c.label} ${u.fmtFixed(probs[i] * 100, 1)}%`;
+			const text = `${c.label} ${u.fmtFixed(probs[i] * 100, 2)}%`;
 			ctx.fillText(text, px + 18, 81);
 			px += 18 + ctx.measureText(text).width + 24;
 		});
 		ctx.fillStyle = "#aeb6bb";
 		ctx.textAlign = "right";
-		ctx.fillText(`k=${data.k} · windows=${data.windows} · boundaries ${u.fmtFixed(data.boundaries.low, 1)}/${u.fmtFixed(data.boundaries.high, 1)} BPM`, W - 40, 56);
+		ctx.fillText(`k=${data.k} · windows=${data.windows} · brain.js · hidden ${data.hidden} · ${data.encoding.min}–${data.encoding.max} BPM`, W - 40, 56);
 	}
 
 	AIIP.ecg = { render, W, H };
