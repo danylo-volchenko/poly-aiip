@@ -9,7 +9,7 @@
 <body>
 	<header class="app-header">
 		<div>
-			<p class="eyebrow">AIIP · Lab 1 · Variant 6</p>
+			<p class="eyebrow">AIIP · Lab 2 · Variant 6</p>
 			<h1>Heart Rhythm Classifier</h1>
 			<p class="subtitle">Bradycardia · Normal sinus rhythm · Tachycardia</p>
 		</div>
@@ -167,7 +167,10 @@
 						<h3>Metrics</h3>
 						<ul class="metrics-list" id="metrics-list" hidden></ul>
 						<h3>Misclassified windows <span class="optional">(first 20)</span></h3>
-						<ol class="misclassified-list" id="misclassified-list" hidden></ol>
+						<details class="misclassified-details" id="misclassified-details" hidden>
+							<summary id="misclassified-summary"></summary>
+							<ol class="misclassified-list" id="misclassified-list"></ol>
+						</details>
 						<h3>Error per epoch</h3>
 						<div class="placeholder" id="error-curve-placeholder">
 							<span class="placeholder-icon">&#9636;</span>

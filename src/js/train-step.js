@@ -157,14 +157,21 @@
 
 		const mis = el("misclassified-list");
 		mis.innerHTML = "";
-		for (const m of ev.misclassified.slice(0, 20)) {
+		const misclassified = ev.misclassified.slice(0, 20);
+		for (const m of misclassified) {
 			const li = document.createElement("li");
 			li.textContent = "true " + m.label + " \u2192 pred " + m.predicted +
 				" (mean " + u.fmtFixed(m.mean, 1) + " BPM): " +
 				m.bpm.map((v) => u.fmtFixed(v, 1)).join(", ");
 			mis.appendChild(li);
 		}
-		mis.hidden = ev.misclassified.length === 0;
+		const summary = el("misclassified-summary");
+		if (misclassified.length) {
+			summary.textContent = ev.misclassified.length + " misclassified \u00b7 first: true " +
+				misclassified[0].label + " \u2192 pred " + misclassified[0].predicted +
+				" (mean " + u.fmtFixed(misclassified[0].mean, 1) + " BPM)";
+		}
+		el("misclassified-details").hidden = ev.misclassified.length === 0;
 	}
 
 	function renderCharts(model)
@@ -197,7 +204,7 @@
 		el("model-summary").hidden = true;
 		el("confusion-table").hidden = true;
 		el("metrics-list").hidden = true;
-		el("misclassified-list").hidden = true;
+		el("misclassified-details").hidden = true;
 		el("error-curve-placeholder").hidden = false;
 		el("error-canvas").hidden = true;
 		el("acc-canvas").hidden = true;

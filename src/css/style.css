@@ -586,6 +586,25 @@ td.diag {
 	color: var(--red);
 }
 
+.misclassified-details {
+	margin: 0 0 14px;
+	font-size: 0.88rem;
+}
+
+.misclassified-details summary {
+	cursor: pointer;
+	color: var(--red);
+	user-select: none;
+}
+
+.misclassified-details summary:hover {
+	text-decoration: underline;
+}
+
+.misclassified-details .misclassified-list {
+	margin-bottom: 6px;
+}
+
 .examples {
 	display: flex;
 	flex-wrap: wrap;
