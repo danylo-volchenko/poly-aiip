@@ -28,6 +28,11 @@
 			const badge = el("status-" + key);
 			if (!badge)
 				return;
+			badge.dataset.state = dot;
+			if (dot === "ready")
+				badge.setAttribute("aria-current", "step");
+			else
+				badge.removeAttribute("aria-current");
 			badge.querySelector(".status-dot").dataset.state = dot;
 			badge.querySelector(".status-summary").textContent = summary;
 		},

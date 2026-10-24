@@ -19,20 +19,23 @@
 		</div>
 	</header>
 
-	<nav class="status-bar" aria-label="Progress overview">
-		<button type="button" id="status-data" class="status-badge" title="Go to Step 1">
+	<nav class="stepper" aria-label="Workflow steps">
+		<button type="button" id="status-data" class="stepper-item" title="Go to Step 1" aria-current="step">
+			<span class="step-number" aria-hidden="true">1</span>
 			<span class="status-dot" data-state="empty"></span>
-			<span class="status-name">Data</span>
+			<span class="status-name">Generate dataset</span>
 			<span class="status-summary">not generated</span>
 		</button>
-		<button type="button" id="status-model" class="status-badge" title="Go to Step 2">
+		<button type="button" id="status-model" class="stepper-item" title="Go to Step 2">
+			<span class="step-number" aria-hidden="true">2</span>
 			<span class="status-dot" data-state="empty"></span>
-			<span class="status-name">Model</span>
+			<span class="status-name">Train model</span>
 			<span class="status-summary">not trained</span>
 		</button>
-		<button type="button" id="status-recognize" class="status-badge" title="Go to Step 3">
+		<button type="button" id="status-recognize" class="stepper-item" title="Go to Step 3">
+			<span class="step-number" aria-hidden="true">3</span>
 			<span class="status-dot" data-state="empty"></span>
-			<span class="status-name">Recognition</span>
+			<span class="status-name">Recognize rhythm</span>
 			<span class="status-summary">no result yet</span>
 		</button>
 	</nav>
@@ -42,7 +45,7 @@
 
 			<section class="card" id="data-card" aria-labelledby="data-title">
 				<div class="card-header">
-					<h2 id="data-title">Generate dataset</h2>
+					<h2 id="data-title">Step 1 — Generate dataset</h2>
 				</div>
 				<div class="card-body">
 					<form class="params" id="data-form" novalidate>
@@ -116,7 +119,7 @@
 
 			<section class="card" id="train-card" aria-labelledby="train-title">
 				<div class="card-header">
-					<h2 id="train-title">Train model</h2>
+					<h2 id="train-title">Step 2 — Train model</h2>
 				</div>
 				<div class="card-body">
 					<form class="params" id="train-form" novalidate>
@@ -179,7 +182,7 @@
 
 			<section class="card" id="recognize-card" aria-labelledby="recognize-title">
 				<div class="card-header">
-					<h2 id="recognize-title">Recognize rhythm</h2>
+					<h2 id="recognize-title">Step 3 — Recognize rhythm</h2>
 				</div>
 				<div class="card-body">
 					<form class="params" id="recognize-form" novalidate>

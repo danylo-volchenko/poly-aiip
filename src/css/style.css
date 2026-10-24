@@ -155,15 +155,16 @@ code {
 	justify-content: center;
 }
 
-.status-bar {
+.stepper {
 	width: min(1180px, calc(100% - 40px));
 	margin: 0 auto 22px;
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	gap: 12px;
+	gap: 24px;
 }
 
-.status-badge {
+.stepper-item {
+	position: relative;
 	display: flex;
 	align-items: center;
 	gap: 9px;
@@ -172,6 +173,52 @@ code {
 	border: 1px solid var(--line);
 	border-radius: 6px;
 	text-align: left;
+}
+
+.stepper-item:not(:last-child)::after {
+	content: "→";
+	position: absolute;
+	top: 50%;
+	right: -20px;
+	width: 16px;
+	text-align: center;
+	transform: translateY(-50%);
+	color: var(--muted);
+	font-size: 1.05rem;
+	font-weight: 600;
+	line-height: 1;
+	pointer-events: none;
+}
+
+.stepper-item[data-state="ready"] {
+	border-color: var(--purple);
+}
+
+.stepper-item .step-number {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	border: 1px solid var(--line);
+	background: transparent;
+	color: var(--muted);
+	font-size: 0.78rem;
+	font-weight: 650;
+	flex-shrink: 0;
+}
+
+.stepper-item[data-state="ready"] .step-number {
+	background: var(--purple);
+	border-color: var(--purple);
+	color: #f2eefb;
+}
+
+.stepper-item[data-state="done"] .step-number {
+	background: var(--green);
+	border-color: var(--green);
+	color: #f2eefb;
 }
 
 .status-dot {
@@ -193,9 +240,12 @@ code {
 .status-name {
 	font-weight: 650;
 	flex-shrink: 0;
+	white-space: nowrap;
 }
 
 .status-summary {
+	flex: 1;
+	min-width: 0;
 	color: var(--muted);
 	font-size: 0.85rem;
 	overflow: hidden;
@@ -843,8 +893,18 @@ td.diag {
 		grid-template-columns: 1fr;
 	}
 
-	.status-bar {
+	.stepper {
 		grid-template-columns: 1fr;
+	}
+
+	.stepper-item:not(:last-child)::after {
+		content: "↓";
+		top: auto;
+		right: auto;
+		bottom: -20px;
+		left: 26px;
+		width: auto;
+		transform: none;
 	}
 
 	.app-header {
