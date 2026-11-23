@@ -1,0 +1,594 @@
+{
+  "meta": {
+    "startedAt": "2026-11-21T14:48:20.727Z",
+    "env": {
+      "runtime": "node 22.23.5",
+      "platform": "linux",
+      "arch": "x64",
+      "userAgent": null,
+      "hardwareConcurrency": null,
+      "engine": "brain.js 2.0.0-beta.24",
+      "worker": false,
+      "cpu": "AMD Ryzen 5 PRO 7540U w/ Radeon 740M Graphics",
+      "cpus": 12,
+      "totalMemBytes": 15378980864,
+      "v8": "12.4.254.21-node.57"
+    },
+    "config": {
+      "quick": false,
+      "repeats": 5,
+      "seed": 7,
+      "warmup": 1,
+      "k": 4,
+      "epochs": 20,
+      "sizes": {
+        "inference": [
+          1000,
+          5000,
+          25000,
+          125000,
+          500000
+        ],
+        "evaluation": [
+          1000,
+          5000,
+          20000,
+          50000
+        ],
+        "training": [
+          1000,
+          5000,
+          20000,
+          50000
+        ],
+        "k": [
+          4,
+          8,
+          16,
+          32,
+          64
+        ],
+        "epochs": [
+          10,
+          25,
+          50,
+          100
+        ]
+      },
+      "testPct": 20,
+      "tol": 4,
+      "hidden": 8,
+      "learningRate": 0.3,
+      "momentum": 0.1
+    },
+    "notes": [],
+    "elapsedMs": 124678
+  },
+  "cases": [
+    {
+      "id": "inference",
+      "title": "Inference vs sequence length",
+      "param": 1000,
+      "unit": "BPM values",
+      "params": {
+        "n": 1000,
+        "k": 4
+      },
+      "runs": [
+        7.953,
+        7.382,
+        5.135,
+        4.836,
+        3.631
+      ],
+      "min": 3.631,
+      "max": 7.953,
+      "mean": 5.787,
+      "median": 5.135,
+      "notes": "predictSeries; 997 windows; K=4"
+    },
+    {
+      "id": "inference",
+      "title": "Inference vs sequence length",
+      "param": 5000,
+      "unit": "BPM values",
+      "params": {
+        "n": 5000,
+        "k": 4
+      },
+      "runs": [
+        23.265,
+        16.439,
+        20.547,
+        20.498,
+        18.884
+      ],
+      "min": 16.439,
+      "max": 23.265,
+      "mean": 19.927,
+      "median": 20.498,
+      "notes": "predictSeries; 4997 windows; K=4"
+    },
+    {
+      "id": "inference",
+      "title": "Inference vs sequence length",
+      "param": 25000,
+      "unit": "BPM values",
+      "params": {
+        "n": 25000,
+        "k": 4
+      },
+      "runs": [
+        93.89,
+        90.174,
+        78.26,
+        75.257,
+        79.291
+      ],
+      "min": 75.257,
+      "max": 93.89,
+      "mean": 83.374,
+      "median": 79.291,
+      "notes": "predictSeries; 24997 windows; K=4"
+    },
+    {
+      "id": "inference",
+      "title": "Inference vs sequence length",
+      "param": 125000,
+      "unit": "BPM values",
+      "params": {
+        "n": 125000,
+        "k": 4
+      },
+      "runs": [
+        418.761,
+        407.056,
+        447.432,
+        435.8,
+        405.629
+      ],
+      "min": 405.629,
+      "max": 447.432,
+      "mean": 422.936,
+      "median": 418.761,
+      "notes": "predictSeries; 124997 windows; K=4"
+    },
+    {
+      "id": "inference",
+      "title": "Inference vs sequence length",
+      "param": 500000,
+      "unit": "BPM values",
+      "params": {
+        "n": 500000,
+        "k": 4
+      },
+      "runs": [
+        1731.319,
+        1751.741,
+        1689.594,
+        1717.019,
+        1785.784
+      ],
+      "min": 1689.594,
+      "max": 1785.784,
+      "mean": 1735.091,
+      "median": 1731.319,
+      "notes": "predictSeries; 499997 windows; K=4"
+    },
+    {
+      "id": "evaluation",
+      "title": "Evaluation vs dataset size",
+      "param": 1002,
+      "unit": "samples",
+      "params": {
+        "samples": 1002,
+        "k": 4
+      },
+      "runs": [
+        9.494,
+        7.376,
+        4.38,
+        3.23,
+        3.488
+      ],
+      "min": 3.23,
+      "max": 9.494,
+      "mean": 5.594,
+      "median": 4.38,
+      "notes": "evaluate on 1002 labelled samples; K=4"
+    },
+    {
+      "id": "evaluation",
+      "title": "Evaluation vs dataset size",
+      "param": 5001,
+      "unit": "samples",
+      "params": {
+        "samples": 5001,
+        "k": 4
+      },
+      "runs": [
+        46.9,
+        40.941,
+        42.889,
+        39.604,
+        38.565
+      ],
+      "min": 38.565,
+      "max": 46.9,
+      "mean": 41.78,
+      "median": 40.941,
+      "notes": "evaluate on 5001 labelled samples; K=4"
+    },
+    {
+      "id": "evaluation",
+      "title": "Evaluation vs dataset size",
+      "param": 20001,
+      "unit": "samples",
+      "params": {
+        "samples": 20001,
+        "k": 4
+      },
+      "runs": [
+        182.148,
+        201.517,
+        171.493,
+        176.855,
+        174.489
+      ],
+      "min": 171.493,
+      "max": 201.517,
+      "mean": 181.3,
+      "median": 176.855,
+      "notes": "evaluate on 20001 labelled samples; K=4"
+    },
+    {
+      "id": "evaluation",
+      "title": "Evaluation vs dataset size",
+      "param": 50001,
+      "unit": "samples",
+      "params": {
+        "samples": 50001,
+        "k": 4
+      },
+      "runs": [
+        418.617,
+        459.503,
+        456.219,
+        467.929,
+        445.384
+      ],
+      "min": 418.617,
+      "max": 467.929,
+      "mean": 449.53,
+      "median": 456.219,
+      "notes": "evaluate on 50001 labelled samples; K=4"
+    },
+    {
+      "id": "training",
+      "title": "Training vs dataset size",
+      "param": 1002,
+      "unit": "samples",
+      "params": {
+        "samples": 1002,
+        "trainSize": 801,
+        "epochs": 20,
+        "hidden": 8,
+        "k": 4
+      },
+      "runs": [
+        184.333,
+        183.026,
+        174.053,
+        184.642,
+        184.355
+      ],
+      "min": 174.053,
+      "max": 184.642,
+      "mean": 182.082,
+      "median": 184.333,
+      "notes": "epochs=20; trainPath=main-thread"
+    },
+    {
+      "id": "training",
+      "title": "Training vs dataset size",
+      "param": 5001,
+      "unit": "samples",
+      "params": {
+        "samples": 5001,
+        "trainSize": 3999,
+        "epochs": 20,
+        "hidden": 8,
+        "k": 4
+      },
+      "runs": [
+        809.062,
+        811.329,
+        811.916,
+        816.615,
+        815.663
+      ],
+      "min": 809.062,
+      "max": 816.615,
+      "mean": 812.917,
+      "median": 811.916,
+      "notes": "epochs=20; trainPath=main-thread"
+    },
+    {
+      "id": "training",
+      "title": "Training vs dataset size",
+      "param": 20001,
+      "unit": "samples",
+      "params": {
+        "samples": 20001,
+        "trainSize": 15999,
+        "epochs": 20,
+        "hidden": 8,
+        "k": 4
+      },
+      "runs": [
+        2226.106,
+        2219.807,
+        2272.04,
+        2253.445,
+        2237.528
+      ],
+      "min": 2219.807,
+      "max": 2272.04,
+      "mean": 2241.785,
+      "median": 2237.528,
+      "notes": "epochs=20; trainPath=main-thread"
+    },
+    {
+      "id": "training",
+      "title": "Training vs dataset size",
+      "param": 50001,
+      "unit": "samples",
+      "params": {
+        "samples": 50001,
+        "trainSize": 39999,
+        "epochs": 20,
+        "hidden": 8,
+        "k": 4
+      },
+      "runs": [
+        5253.112,
+        5290.577,
+        5446.821,
+        5234.783,
+        5311.834
+      ],
+      "min": 5234.783,
+      "max": 5446.821,
+      "mean": 5307.425,
+      "median": 5290.577,
+      "notes": "epochs=20; trainPath=main-thread"
+    },
+    {
+      "id": "window-k",
+      "title": "Window size K",
+      "param": 4,
+      "unit": "values",
+      "params": {
+        "k": 4,
+        "n": 50000
+      },
+      "runs": [
+        186.766,
+        232.069,
+        177.859,
+        170.891,
+        190.911
+      ],
+      "min": 170.891,
+      "max": 232.069,
+      "mean": 191.699,
+      "median": 186.766,
+      "notes": "predictSeries on N=50000; K=4; model trained per K"
+    },
+    {
+      "id": "window-k",
+      "title": "Window size K",
+      "param": 8,
+      "unit": "values",
+      "params": {
+        "k": 8,
+        "n": 50000
+      },
+      "runs": [
+        196.004,
+        167.576,
+        182.241,
+        189.882,
+        182.055
+      ],
+      "min": 167.576,
+      "max": 196.004,
+      "mean": 183.552,
+      "median": 182.241,
+      "notes": "predictSeries on N=50000; K=8; model trained per K"
+    },
+    {
+      "id": "window-k",
+      "title": "Window size K",
+      "param": 16,
+      "unit": "values",
+      "params": {
+        "k": 16,
+        "n": 50000
+      },
+      "runs": [
+        207.294,
+        209.427,
+        196.003,
+        211.742,
+        200.497
+      ],
+      "min": 196.003,
+      "max": 211.742,
+      "mean": 204.993,
+      "median": 207.294,
+      "notes": "predictSeries on N=50000; K=16; model trained per K"
+    },
+    {
+      "id": "window-k",
+      "title": "Window size K",
+      "param": 32,
+      "unit": "values",
+      "params": {
+        "k": 32,
+        "n": 50000
+      },
+      "runs": [
+        220.074,
+        218.937,
+        229.504,
+        230.163,
+        256.067
+      ],
+      "min": 218.937,
+      "max": 256.067,
+      "mean": 230.949,
+      "median": 229.504,
+      "notes": "predictSeries on N=50000; K=32; model trained per K"
+    },
+    {
+      "id": "window-k",
+      "title": "Window size K",
+      "param": 64,
+      "unit": "values",
+      "params": {
+        "k": 64,
+        "n": 50000
+      },
+      "runs": [
+        270.501,
+        287.058,
+        278.081,
+        270.146,
+        284.672
+      ],
+      "min": 270.146,
+      "max": 287.058,
+      "mean": 278.092,
+      "median": 278.081,
+      "notes": "predictSeries on N=50000; K=64; model trained per K"
+    },
+    {
+      "id": "epochs",
+      "title": "Training epochs",
+      "param": 10,
+      "unit": "epochs",
+      "params": {
+        "samples": 5001,
+        "epochs": 10,
+        "hidden": 8,
+        "k": 4
+      },
+      "runs": [
+        408.457,
+        400.435,
+        396.615,
+        403.315,
+        407.043
+      ],
+      "min": 396.615,
+      "max": 408.457,
+      "mean": 403.173,
+      "median": 403.315,
+      "notes": "S=5000; K=4; trainPath=main-thread"
+    },
+    {
+      "id": "epochs",
+      "title": "Training epochs",
+      "param": 25,
+      "unit": "epochs",
+      "params": {
+        "samples": 5001,
+        "epochs": 25,
+        "hidden": 8,
+        "k": 4
+      },
+      "runs": [
+        1005.685,
+        1057.379,
+        986.701,
+        1015.422,
+        1024.093
+      ],
+      "min": 986.701,
+      "max": 1057.379,
+      "mean": 1017.856,
+      "median": 1015.422,
+      "notes": "S=5000; K=4; trainPath=main-thread"
+    },
+    {
+      "id": "epochs",
+      "title": "Training epochs",
+      "param": 50,
+      "unit": "epochs",
+      "params": {
+        "samples": 5001,
+        "epochs": 50,
+        "hidden": 8,
+        "k": 4
+      },
+      "runs": [
+        2055.602,
+        2059.29,
+        2069.168,
+        2053.065,
+        2025.958
+      ],
+      "min": 2025.958,
+      "max": 2069.168,
+      "mean": 2052.617,
+      "median": 2055.602,
+      "notes": "S=5000; K=4; trainPath=main-thread"
+    },
+    {
+      "id": "epochs",
+      "title": "Training epochs",
+      "param": 100,
+      "unit": "epochs",
+      "params": {
+        "samples": 5001,
+        "epochs": 100,
+        "hidden": 8,
+        "k": 4
+      },
+      "runs": [
+        4131.315,
+        4091.389,
+        4064.605,
+        4124.323,
+        4144.665
+      ],
+      "min": 4064.605,
+      "max": 4144.665,
+      "mean": 4111.259,
+      "median": 4124.323,
+      "notes": "S=5000; K=4; trainPath=main-thread"
+    },
+    {
+      "id": "worker-main",
+      "title": "Worker vs main thread",
+      "param": "worker/main",
+      "unit": "ms",
+      "params": {
+        "paths": [
+          "worker",
+          "main-thread"
+        ],
+        "samples": 5000,
+        "epochs": 20,
+        "k": 4
+      },
+      "runs": [],
+      "min": null,
+      "max": null,
+      "mean": null,
+      "median": null,
+      "notes": "skipped: Worker unavailable (Node)"
+    }
+  ]
+}

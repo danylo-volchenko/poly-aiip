@@ -23,6 +23,8 @@
 			AIIP.dataStep.updateGating(ctx);
 			AIIP.trainStep.updateGating(ctx);
 			AIIP.recognizeStep.updateGating(ctx);
+			if (AIIP.benchStep)
+				AIIP.benchStep.updateGating(ctx);
 		},
 		setStatus(key, dot, summary) {
 			const badge = el("status-" + key);
@@ -145,6 +147,35 @@
 		else
 			ss.appendChild(document.createTextNode("no file saved yet"));
 
+		const bs = section("Benchmark");
+		const scenarios = document.createElement("ul");
+		for (const text of [
+			"Inference vs sequence length: predictSeries on N = 1 000 / 5 000 / 25 000 / 125 000 / 500 000 BPM values",
+			"Evaluation vs dataset size: evaluate on S = 1 000 / 5 000 / 20 000 / 50 000 samples",
+			"Training vs dataset size: fresh model on S samples, 20 epochs",
+			"Window size K: K = 4 / 8 / 16 / 32 / 64 at N = 50 000",
+			"Training epochs: 10 / 25 / 50 / 100 at S = 5 000",
+		]) {
+			const li = document.createElement("li");
+			li.textContent = text;
+			scenarios.appendChild(li);
+		}
+		bs.appendChild(scenarios);
+		const runner = document.createElement("p");
+		runner.appendChild(document.createTextNode("Node runner: "));
+		const cmd = document.createElement("code");
+		cmd.textContent = "node bench/run.js";
+		runner.appendChild(cmd);
+		runner.appendChild(document.createTextNode(" (flags "));
+		const flags = document.createElement("code");
+		flags.textContent = "--quick --repeats --out";
+		runner.appendChild(flags);
+		runner.appendChild(document.createTextNode(")"));
+		bs.appendChild(runner);
+		const note = document.createElement("p");
+		note.textContent = "Canonical report numbers come from the Node runner; the in-app panel is a demo and may differ in absolute times.";
+		bs.appendChild(note);
+
 		const es = section("Environment");
 		kv(es, [
 			["model engine", "brain.js " + (AIIP.engine ? AIIP.engine.version : "")],
@@ -198,6 +229,7 @@
 			data: el("data-card"),
 			model: el("train-card"),
 			recognize: el("recognize-card"),
+			bench: el("bench-card"),
 		};
 		for (const key of Object.keys(cards)) {
 			el("status-" + key).addEventListener("click", () => {
@@ -237,6 +269,9 @@
 				}
 				if (s.model) {
 					AIIP.trainStep.renderCharts(s.model);
+				}
+				if (AIIP.benchStep) {
+					AIIP.benchStep.renderCharts();
 				}
 				if (s.recognition && s.model) {
 					const m = s.model;
@@ -321,12 +356,84 @@
 		});
 	}
 
+	function benchSmoke()
+	{
+		const mark = (msg) => {
+			let d = document.getElementById("bench-smoke-result");
+			if (!d) {
+				d = document.createElement("div");
+				d.id = "bench-smoke-result";
+				document.body.appendChild(d);
+			}
+			d.textContent = msg;
+		};
+		const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+		if (!AIIP.bench || typeof AIIP.bench.run !== "function") {
+			mark("BENCH-SMOKE: SKIP - bench core missing (js/bench.js)");
+			return;
+		}
+
+		async function drive()
+		{
+			let tries = 0;
+			if (!ctx.state.dataset) {
+				el("data-generate").click();
+				while ((!ctx.state.dataset || ctx.state.busy) && tries++ < 400)
+					await sleep(50);
+				if (!ctx.state.dataset)
+					throw new Error("no dataset before bench smoke");
+			}
+			if (!ctx.state.model) {
+				el("train-epochs").value = "200";
+				el("train-start").click();
+				tries = 0;
+				while ((!ctx.state.model || ctx.state.busy) && tries++ < 1200)
+					await sleep(50);
+				if (!ctx.state.model)
+					throw new Error("no model before bench smoke");
+			}
+
+			el("bench-series-lengths").value = "200,1000";
+			el("bench-dataset-sizes").value = "200,500";
+			el("bench-k").value = "4";
+			el("bench-epochs").value = "2";
+			el("bench-repeats").value = "1";
+			ctx.refresh();
+			if (el("bench-run").disabled)
+				throw new Error("bench Run disabled with model present");
+
+			el("bench-run").click();
+			tries = 0;
+			while (ctx.state.busy && tries++ < 2400)
+				await sleep(50);
+			if (ctx.state.busy)
+				throw new Error("benchmark did not finish in time");
+			if (!el("bench-errors").hidden)
+				throw new Error("bench errors visible after run");
+			const rows = el("bench-table").querySelectorAll("tr").length - 1;
+			if (rows < 1)
+				throw new Error("no benchmark table rows");
+			if (el("status-bench").dataset.state !== "done")
+				throw new Error("bench status not done");
+			if (el("bench-chart").hidden)
+				throw new Error("bench chart hidden after run");
+			mark("BENCH-SMOKE: PASS - " + rows + " cases");
+		}
+
+		drive().catch((e) => {
+			mark("BENCH-SMOKE: FAIL - " + (e && e.message ? e.message : e));
+		});
+	}
+
 	function init()
 	{
 		initLog();
 		AIIP.dataStep.init(ctx);
 		AIIP.trainStep.init(ctx);
 		AIIP.recognizeStep.init(ctx);
+		if (AIIP.benchStep)
+			AIIP.benchStep.init(ctx);
 		initStatus();
 		initModals();
 		initResize();
@@ -335,8 +442,11 @@
 		AIIP.logger.info("engine: brain.js " +
 			(AIIP.engine ? AIIP.engine.version : "") +
 			" (neural network; Web Worker training, main-thread fallback)");
-		if (new URLSearchParams(location.search).get("appsmoke") === "1")
+		const params = new URLSearchParams(location.search);
+		if (params.get("appsmoke") === "1")
 			selfSmoke();
+		else if (params.get("benchsmoke") === "1")
+			benchSmoke();
 	}
 
 	if (document.readyState === "loading")

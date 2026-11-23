@@ -9,7 +9,7 @@
 <body>
 	<header class="app-header">
 		<div>
-			<p class="eyebrow">AIIP · Lab 2 · Variant 6</p>
+			<p class="eyebrow">AIIP · Lab 3 · Variant 6</p>
 			<h1>Heart Rhythm Classifier</h1>
 			<p class="subtitle">Bradycardia · Normal sinus rhythm · Tachycardia</p>
 		</div>
@@ -37,6 +37,12 @@
 			<span class="status-dot" data-state="empty"></span>
 			<span class="status-name">Recognize rhythm</span>
 			<span class="status-summary">no result yet</span>
+		</button>
+		<button type="button" id="status-bench" class="stepper-item" title="Go to Step 4">
+			<span class="step-number" aria-hidden="true">4</span>
+			<span class="status-dot" data-state="empty"></span>
+			<span class="status-name">Benchmark</span>
+			<span class="status-summary">not run</span>
 		</button>
 	</nav>
 
@@ -246,6 +252,61 @@
 				</div>
 			</section>
 
+			<section class="card" id="bench-card" aria-labelledby="bench-title">
+				<div class="card-header">
+					<h2 id="bench-title">Step 4 - Benchmark</h2>
+				</div>
+				<div class="card-body">
+					<form class="params" id="bench-form" novalidate>
+						<div class="field-row">
+							<label for="bench-series-lengths">Sequence lengths (N, 100&ndash;1,000,000)</label>
+							<input type="text" id="bench-series-lengths" value="1000,5000,25000,125000,500000">
+						</div>
+						<div class="field-row">
+							<label for="bench-dataset-sizes">Dataset sizes (S, 100&ndash;100,000)</label>
+							<input type="text" id="bench-dataset-sizes" value="1000,5000,20000,50000">
+						</div>
+						<div class="field-row">
+							<label for="bench-k">Window K (2&ndash;64)</label>
+							<input type="number" id="bench-k" min="2" max="64" value="4">
+						</div>
+						<div class="field-row">
+							<label for="bench-epochs">Training epochs (1&ndash;500)</label>
+							<input type="number" id="bench-epochs" min="1" max="500" value="20">
+						</div>
+						<div class="field-row">
+							<label for="bench-repeats">Runs per case (1&ndash;20)</label>
+							<input type="number" id="bench-repeats" min="1" max="20" value="5">
+						</div>
+						<div class="progress" role="progressbar" aria-label="Benchmark progress"
+							aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+							id="bench-progress-wrap">
+							<div class="progress-fill" id="bench-progress"></div>
+						</div>
+						<p class="progress-text" id="bench-progress-text">idle</p>
+						<div class="button-row">
+							<button type="button" id="bench-run" class="primary" disabled>Run benchmark</button>
+							<button type="button" id="bench-stop" disabled>Stop</button>
+							<button type="button" id="bench-save-csv" disabled>Save CSV</button>
+							<button type="button" id="bench-save-json" disabled>Save JSON</button>
+						</div>
+						<p class="hint" id="bench-hint">Train or load a model first</p>
+						<p class="hint" id="bench-notes" hidden></p>
+						<div class="errors" id="bench-errors" role="alert" hidden></div>
+					</form>
+					<div class="results">
+						<h3>Results</h3>
+						<div class="table-wrap" id="bench-table" hidden></div>
+						<h3>Time vs parameter</h3>
+						<div class="placeholder" id="bench-chart-placeholder">
+							<span class="placeholder-icon">&#9636;</span>
+							<p>Benchmark chart appears after a run</p>
+						</div>
+						<canvas id="bench-chart" hidden></canvas>
+					</div>
+				</div>
+			</section>
+
 		</main>
 
 		<aside class="log-panel" id="log-panel" aria-label="Operations log">
@@ -287,6 +348,7 @@
 					<li><strong>Generate dataset</strong> - sequences per formula (4): <code>Tmax = random(min&hellip;max)</code>, <code>Tmin = Tmax &minus; random(tol)</code>, each of K values picks <code>Tmax</code> or <code>Tmin</code>. Stratified 80/20 train/test split.</li>
 					<li><strong>Train model</strong> - a Brain.js feed-forward network (K inputs, one hidden layer, 3 outputs) is trained inside a Web Worker, one epoch per iteration. Learning rate, momentum and hidden neurons configure the network; early stop halts when the training error drops below the threshold. If the Worker cannot start, training falls back to the main thread.</li>
 					<li><strong>Recognize rhythm</strong> - any sequence &ge; K values, sliding window of K with step 1, probabilities averaged over windows. Values convert between BPM and RR (ms) via <code>60000&nbsp;/&nbsp;RR</code>.</li>
+					<li><strong>Benchmark</strong> - runs timing scenarios for inference vs sequence length, evaluation and training vs dataset size, window K and training epochs. Each case discards a warm-up run and reports min, mean and median over the configured repeats; results export as CSV or JSON.</li>
 				</ol>
 				<h3>Class ranges, BPM</h3>
 				<ul class="help-ranges">
@@ -299,6 +361,8 @@
 					<li>Sequence length for recognition: K to 200 values</li>
 					<li>BPM accepted: 20&ndash;300; RR accepted: 200&ndash;3000 ms</li>
 					<li>File loads: dataset <code>.csv</code>/<code>.json</code>, sequence <code>.txt</code>/<code>.csv</code>, model <code>.json</code></li>
+					<li>Benchmark: sequence lengths, dataset sizes, K, epochs and repeats are configurable; a full browser battery can take several minutes</li>
+					<li>Benchmark: canonical report numbers come from the Node runner <code>node bench/run.js</code>; the in-app panel is a demo and may differ in absolute times</li>
 					<li>Engine: Brain.js 2.0.0-beta.24 feed-forward neural network (trained in a Web Worker, main-thread fallback)</li>
 				</ul>
 			</div>
@@ -319,6 +383,8 @@
 	<script src="js/data-step.js"></script>
 	<script src="js/train-step.js"></script>
 	<script src="js/recognize-step.js"></script>
+	<script src="js/bench.js"></script>
+	<script src="js/bench-step.js"></script>
 	<script src="js/app.js"></script>
 </body>
 </html>

@@ -159,12 +159,13 @@ code {
 	width: min(1180px, calc(100% - 40px));
 	margin: 0 auto 22px;
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
+	grid-template-columns: repeat(4, minmax(0, 1fr));
 	gap: 24px;
 }
 
 .stepper-item {
 	position: relative;
+	min-width: 0;
 	display: flex;
 	align-items: center;
 	gap: 9px;
@@ -890,6 +891,40 @@ td.diag {
 .help-ranges {
 	list-style: none;
 	padding: 0;
+}
+
+#bench-form input[type="text"] {
+	font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+	font-size: 0.88rem;
+}
+
+#bench-table td,
+#bench-table th {
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+}
+
+#bench-table td:first-child,
+#bench-table th:first-child,
+#bench-table td:nth-child(2),
+#bench-table th:nth-child(2) {
+	text-align: left;
+}
+
+#bench-table td:first-child {
+	white-space: normal;
+	min-width: 130px;
+}
+
+#bench-chart {
+	border-color: var(--purple);
+}
+
+#bench-card .results p {
+	font-size: 0.85rem;
+	color: var(--muted);
+	line-height: 1.5;
+	margin-bottom: 6px;
 }
 
 [hidden] {

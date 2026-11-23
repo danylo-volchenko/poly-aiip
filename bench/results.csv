@@ -1,0 +1,112 @@
+case,title,param,unit,params,run,ms,min,max,mean,median,notes
+inference,Inference vs sequence length,1000,BPM values,"{""n"":1000,""k"":4}",1,7.953,3.631,7.953,5.787,5.135,predictSeries; 997 windows; K=4
+inference,Inference vs sequence length,1000,BPM values,"{""n"":1000,""k"":4}",2,7.382,3.631,7.953,5.787,5.135,predictSeries; 997 windows; K=4
+inference,Inference vs sequence length,1000,BPM values,"{""n"":1000,""k"":4}",3,5.135,3.631,7.953,5.787,5.135,predictSeries; 997 windows; K=4
+inference,Inference vs sequence length,1000,BPM values,"{""n"":1000,""k"":4}",4,4.836,3.631,7.953,5.787,5.135,predictSeries; 997 windows; K=4
+inference,Inference vs sequence length,1000,BPM values,"{""n"":1000,""k"":4}",5,3.631,3.631,7.953,5.787,5.135,predictSeries; 997 windows; K=4
+inference,Inference vs sequence length,5000,BPM values,"{""n"":5000,""k"":4}",1,23.265,16.439,23.265,19.927,20.498,predictSeries; 4997 windows; K=4
+inference,Inference vs sequence length,5000,BPM values,"{""n"":5000,""k"":4}",2,16.439,16.439,23.265,19.927,20.498,predictSeries; 4997 windows; K=4
+inference,Inference vs sequence length,5000,BPM values,"{""n"":5000,""k"":4}",3,20.547,16.439,23.265,19.927,20.498,predictSeries; 4997 windows; K=4
+inference,Inference vs sequence length,5000,BPM values,"{""n"":5000,""k"":4}",4,20.498,16.439,23.265,19.927,20.498,predictSeries; 4997 windows; K=4
+inference,Inference vs sequence length,5000,BPM values,"{""n"":5000,""k"":4}",5,18.884,16.439,23.265,19.927,20.498,predictSeries; 4997 windows; K=4
+inference,Inference vs sequence length,25000,BPM values,"{""n"":25000,""k"":4}",1,93.89,75.257,93.89,83.374,79.291,predictSeries; 24997 windows; K=4
+inference,Inference vs sequence length,25000,BPM values,"{""n"":25000,""k"":4}",2,90.174,75.257,93.89,83.374,79.291,predictSeries; 24997 windows; K=4
+inference,Inference vs sequence length,25000,BPM values,"{""n"":25000,""k"":4}",3,78.26,75.257,93.89,83.374,79.291,predictSeries; 24997 windows; K=4
+inference,Inference vs sequence length,25000,BPM values,"{""n"":25000,""k"":4}",4,75.257,75.257,93.89,83.374,79.291,predictSeries; 24997 windows; K=4
+inference,Inference vs sequence length,25000,BPM values,"{""n"":25000,""k"":4}",5,79.291,75.257,93.89,83.374,79.291,predictSeries; 24997 windows; K=4
+inference,Inference vs sequence length,125000,BPM values,"{""n"":125000,""k"":4}",1,418.761,405.629,447.432,422.936,418.761,predictSeries; 124997 windows; K=4
+inference,Inference vs sequence length,125000,BPM values,"{""n"":125000,""k"":4}",2,407.056,405.629,447.432,422.936,418.761,predictSeries; 124997 windows; K=4
+inference,Inference vs sequence length,125000,BPM values,"{""n"":125000,""k"":4}",3,447.432,405.629,447.432,422.936,418.761,predictSeries; 124997 windows; K=4
+inference,Inference vs sequence length,125000,BPM values,"{""n"":125000,""k"":4}",4,435.8,405.629,447.432,422.936,418.761,predictSeries; 124997 windows; K=4
+inference,Inference vs sequence length,125000,BPM values,"{""n"":125000,""k"":4}",5,405.629,405.629,447.432,422.936,418.761,predictSeries; 124997 windows; K=4
+inference,Inference vs sequence length,500000,BPM values,"{""n"":500000,""k"":4}",1,1731.319,1689.594,1785.784,1735.091,1731.319,predictSeries; 499997 windows; K=4
+inference,Inference vs sequence length,500000,BPM values,"{""n"":500000,""k"":4}",2,1751.741,1689.594,1785.784,1735.091,1731.319,predictSeries; 499997 windows; K=4
+inference,Inference vs sequence length,500000,BPM values,"{""n"":500000,""k"":4}",3,1689.594,1689.594,1785.784,1735.091,1731.319,predictSeries; 499997 windows; K=4
+inference,Inference vs sequence length,500000,BPM values,"{""n"":500000,""k"":4}",4,1717.019,1689.594,1785.784,1735.091,1731.319,predictSeries; 499997 windows; K=4
+inference,Inference vs sequence length,500000,BPM values,"{""n"":500000,""k"":4}",5,1785.784,1689.594,1785.784,1735.091,1731.319,predictSeries; 499997 windows; K=4
+evaluation,Evaluation vs dataset size,1002,samples,"{""samples"":1002,""k"":4}",1,9.494,3.23,9.494,5.594,4.38,evaluate on 1002 labelled samples; K=4
+evaluation,Evaluation vs dataset size,1002,samples,"{""samples"":1002,""k"":4}",2,7.376,3.23,9.494,5.594,4.38,evaluate on 1002 labelled samples; K=4
+evaluation,Evaluation vs dataset size,1002,samples,"{""samples"":1002,""k"":4}",3,4.38,3.23,9.494,5.594,4.38,evaluate on 1002 labelled samples; K=4
+evaluation,Evaluation vs dataset size,1002,samples,"{""samples"":1002,""k"":4}",4,3.23,3.23,9.494,5.594,4.38,evaluate on 1002 labelled samples; K=4
+evaluation,Evaluation vs dataset size,1002,samples,"{""samples"":1002,""k"":4}",5,3.488,3.23,9.494,5.594,4.38,evaluate on 1002 labelled samples; K=4
+evaluation,Evaluation vs dataset size,5001,samples,"{""samples"":5001,""k"":4}",1,46.9,38.565,46.9,41.78,40.941,evaluate on 5001 labelled samples; K=4
+evaluation,Evaluation vs dataset size,5001,samples,"{""samples"":5001,""k"":4}",2,40.941,38.565,46.9,41.78,40.941,evaluate on 5001 labelled samples; K=4
+evaluation,Evaluation vs dataset size,5001,samples,"{""samples"":5001,""k"":4}",3,42.889,38.565,46.9,41.78,40.941,evaluate on 5001 labelled samples; K=4
+evaluation,Evaluation vs dataset size,5001,samples,"{""samples"":5001,""k"":4}",4,39.604,38.565,46.9,41.78,40.941,evaluate on 5001 labelled samples; K=4
+evaluation,Evaluation vs dataset size,5001,samples,"{""samples"":5001,""k"":4}",5,38.565,38.565,46.9,41.78,40.941,evaluate on 5001 labelled samples; K=4
+evaluation,Evaluation vs dataset size,20001,samples,"{""samples"":20001,""k"":4}",1,182.148,171.493,201.517,181.3,176.855,evaluate on 20001 labelled samples; K=4
+evaluation,Evaluation vs dataset size,20001,samples,"{""samples"":20001,""k"":4}",2,201.517,171.493,201.517,181.3,176.855,evaluate on 20001 labelled samples; K=4
+evaluation,Evaluation vs dataset size,20001,samples,"{""samples"":20001,""k"":4}",3,171.493,171.493,201.517,181.3,176.855,evaluate on 20001 labelled samples; K=4
+evaluation,Evaluation vs dataset size,20001,samples,"{""samples"":20001,""k"":4}",4,176.855,171.493,201.517,181.3,176.855,evaluate on 20001 labelled samples; K=4
+evaluation,Evaluation vs dataset size,20001,samples,"{""samples"":20001,""k"":4}",5,174.489,171.493,201.517,181.3,176.855,evaluate on 20001 labelled samples; K=4
+evaluation,Evaluation vs dataset size,50001,samples,"{""samples"":50001,""k"":4}",1,418.617,418.617,467.929,449.53,456.219,evaluate on 50001 labelled samples; K=4
+evaluation,Evaluation vs dataset size,50001,samples,"{""samples"":50001,""k"":4}",2,459.503,418.617,467.929,449.53,456.219,evaluate on 50001 labelled samples; K=4
+evaluation,Evaluation vs dataset size,50001,samples,"{""samples"":50001,""k"":4}",3,456.219,418.617,467.929,449.53,456.219,evaluate on 50001 labelled samples; K=4
+evaluation,Evaluation vs dataset size,50001,samples,"{""samples"":50001,""k"":4}",4,467.929,418.617,467.929,449.53,456.219,evaluate on 50001 labelled samples; K=4
+evaluation,Evaluation vs dataset size,50001,samples,"{""samples"":50001,""k"":4}",5,445.384,418.617,467.929,449.53,456.219,evaluate on 50001 labelled samples; K=4
+training,Training vs dataset size,1002,samples,"{""samples"":1002,""trainSize"":801,""epochs"":20,""hidden"":8,""k"":4}",1,184.333,174.053,184.642,182.082,184.333,epochs=20; trainPath=main-thread
+training,Training vs dataset size,1002,samples,"{""samples"":1002,""trainSize"":801,""epochs"":20,""hidden"":8,""k"":4}",2,183.026,174.053,184.642,182.082,184.333,epochs=20; trainPath=main-thread
+training,Training vs dataset size,1002,samples,"{""samples"":1002,""trainSize"":801,""epochs"":20,""hidden"":8,""k"":4}",3,174.053,174.053,184.642,182.082,184.333,epochs=20; trainPath=main-thread
+training,Training vs dataset size,1002,samples,"{""samples"":1002,""trainSize"":801,""epochs"":20,""hidden"":8,""k"":4}",4,184.642,174.053,184.642,182.082,184.333,epochs=20; trainPath=main-thread
+training,Training vs dataset size,1002,samples,"{""samples"":1002,""trainSize"":801,""epochs"":20,""hidden"":8,""k"":4}",5,184.355,174.053,184.642,182.082,184.333,epochs=20; trainPath=main-thread
+training,Training vs dataset size,5001,samples,"{""samples"":5001,""trainSize"":3999,""epochs"":20,""hidden"":8,""k"":4}",1,809.062,809.062,816.615,812.917,811.916,epochs=20; trainPath=main-thread
+training,Training vs dataset size,5001,samples,"{""samples"":5001,""trainSize"":3999,""epochs"":20,""hidden"":8,""k"":4}",2,811.329,809.062,816.615,812.917,811.916,epochs=20; trainPath=main-thread
+training,Training vs dataset size,5001,samples,"{""samples"":5001,""trainSize"":3999,""epochs"":20,""hidden"":8,""k"":4}",3,811.916,809.062,816.615,812.917,811.916,epochs=20; trainPath=main-thread
+training,Training vs dataset size,5001,samples,"{""samples"":5001,""trainSize"":3999,""epochs"":20,""hidden"":8,""k"":4}",4,816.615,809.062,816.615,812.917,811.916,epochs=20; trainPath=main-thread
+training,Training vs dataset size,5001,samples,"{""samples"":5001,""trainSize"":3999,""epochs"":20,""hidden"":8,""k"":4}",5,815.663,809.062,816.615,812.917,811.916,epochs=20; trainPath=main-thread
+training,Training vs dataset size,20001,samples,"{""samples"":20001,""trainSize"":15999,""epochs"":20,""hidden"":8,""k"":4}",1,2226.106,2219.807,2272.04,2241.785,2237.528,epochs=20; trainPath=main-thread
+training,Training vs dataset size,20001,samples,"{""samples"":20001,""trainSize"":15999,""epochs"":20,""hidden"":8,""k"":4}",2,2219.807,2219.807,2272.04,2241.785,2237.528,epochs=20; trainPath=main-thread
+training,Training vs dataset size,20001,samples,"{""samples"":20001,""trainSize"":15999,""epochs"":20,""hidden"":8,""k"":4}",3,2272.04,2219.807,2272.04,2241.785,2237.528,epochs=20; trainPath=main-thread
+training,Training vs dataset size,20001,samples,"{""samples"":20001,""trainSize"":15999,""epochs"":20,""hidden"":8,""k"":4}",4,2253.445,2219.807,2272.04,2241.785,2237.528,epochs=20; trainPath=main-thread
+training,Training vs dataset size,20001,samples,"{""samples"":20001,""trainSize"":15999,""epochs"":20,""hidden"":8,""k"":4}",5,2237.528,2219.807,2272.04,2241.785,2237.528,epochs=20; trainPath=main-thread
+training,Training vs dataset size,50001,samples,"{""samples"":50001,""trainSize"":39999,""epochs"":20,""hidden"":8,""k"":4}",1,5253.112,5234.783,5446.821,5307.425,5290.577,epochs=20; trainPath=main-thread
+training,Training vs dataset size,50001,samples,"{""samples"":50001,""trainSize"":39999,""epochs"":20,""hidden"":8,""k"":4}",2,5290.577,5234.783,5446.821,5307.425,5290.577,epochs=20; trainPath=main-thread
+training,Training vs dataset size,50001,samples,"{""samples"":50001,""trainSize"":39999,""epochs"":20,""hidden"":8,""k"":4}",3,5446.821,5234.783,5446.821,5307.425,5290.577,epochs=20; trainPath=main-thread
+training,Training vs dataset size,50001,samples,"{""samples"":50001,""trainSize"":39999,""epochs"":20,""hidden"":8,""k"":4}",4,5234.783,5234.783,5446.821,5307.425,5290.577,epochs=20; trainPath=main-thread
+training,Training vs dataset size,50001,samples,"{""samples"":50001,""trainSize"":39999,""epochs"":20,""hidden"":8,""k"":4}",5,5311.834,5234.783,5446.821,5307.425,5290.577,epochs=20; trainPath=main-thread
+window-k,Window size K,4,values,"{""k"":4,""n"":50000}",1,186.766,170.891,232.069,191.699,186.766,predictSeries on N=50000; K=4; model trained per K
+window-k,Window size K,4,values,"{""k"":4,""n"":50000}",2,232.069,170.891,232.069,191.699,186.766,predictSeries on N=50000; K=4; model trained per K
+window-k,Window size K,4,values,"{""k"":4,""n"":50000}",3,177.859,170.891,232.069,191.699,186.766,predictSeries on N=50000; K=4; model trained per K
+window-k,Window size K,4,values,"{""k"":4,""n"":50000}",4,170.891,170.891,232.069,191.699,186.766,predictSeries on N=50000; K=4; model trained per K
+window-k,Window size K,4,values,"{""k"":4,""n"":50000}",5,190.911,170.891,232.069,191.699,186.766,predictSeries on N=50000; K=4; model trained per K
+window-k,Window size K,8,values,"{""k"":8,""n"":50000}",1,196.004,167.576,196.004,183.552,182.241,predictSeries on N=50000; K=8; model trained per K
+window-k,Window size K,8,values,"{""k"":8,""n"":50000}",2,167.576,167.576,196.004,183.552,182.241,predictSeries on N=50000; K=8; model trained per K
+window-k,Window size K,8,values,"{""k"":8,""n"":50000}",3,182.241,167.576,196.004,183.552,182.241,predictSeries on N=50000; K=8; model trained per K
+window-k,Window size K,8,values,"{""k"":8,""n"":50000}",4,189.882,167.576,196.004,183.552,182.241,predictSeries on N=50000; K=8; model trained per K
+window-k,Window size K,8,values,"{""k"":8,""n"":50000}",5,182.055,167.576,196.004,183.552,182.241,predictSeries on N=50000; K=8; model trained per K
+window-k,Window size K,16,values,"{""k"":16,""n"":50000}",1,207.294,196.003,211.742,204.993,207.294,predictSeries on N=50000; K=16; model trained per K
+window-k,Window size K,16,values,"{""k"":16,""n"":50000}",2,209.427,196.003,211.742,204.993,207.294,predictSeries on N=50000; K=16; model trained per K
+window-k,Window size K,16,values,"{""k"":16,""n"":50000}",3,196.003,196.003,211.742,204.993,207.294,predictSeries on N=50000; K=16; model trained per K
+window-k,Window size K,16,values,"{""k"":16,""n"":50000}",4,211.742,196.003,211.742,204.993,207.294,predictSeries on N=50000; K=16; model trained per K
+window-k,Window size K,16,values,"{""k"":16,""n"":50000}",5,200.497,196.003,211.742,204.993,207.294,predictSeries on N=50000; K=16; model trained per K
+window-k,Window size K,32,values,"{""k"":32,""n"":50000}",1,220.074,218.937,256.067,230.949,229.504,predictSeries on N=50000; K=32; model trained per K
+window-k,Window size K,32,values,"{""k"":32,""n"":50000}",2,218.937,218.937,256.067,230.949,229.504,predictSeries on N=50000; K=32; model trained per K
+window-k,Window size K,32,values,"{""k"":32,""n"":50000}",3,229.504,218.937,256.067,230.949,229.504,predictSeries on N=50000; K=32; model trained per K
+window-k,Window size K,32,values,"{""k"":32,""n"":50000}",4,230.163,218.937,256.067,230.949,229.504,predictSeries on N=50000; K=32; model trained per K
+window-k,Window size K,32,values,"{""k"":32,""n"":50000}",5,256.067,218.937,256.067,230.949,229.504,predictSeries on N=50000; K=32; model trained per K
+window-k,Window size K,64,values,"{""k"":64,""n"":50000}",1,270.501,270.146,287.058,278.092,278.081,predictSeries on N=50000; K=64; model trained per K
+window-k,Window size K,64,values,"{""k"":64,""n"":50000}",2,287.058,270.146,287.058,278.092,278.081,predictSeries on N=50000; K=64; model trained per K
+window-k,Window size K,64,values,"{""k"":64,""n"":50000}",3,278.081,270.146,287.058,278.092,278.081,predictSeries on N=50000; K=64; model trained per K
+window-k,Window size K,64,values,"{""k"":64,""n"":50000}",4,270.146,270.146,287.058,278.092,278.081,predictSeries on N=50000; K=64; model trained per K
+window-k,Window size K,64,values,"{""k"":64,""n"":50000}",5,284.672,270.146,287.058,278.092,278.081,predictSeries on N=50000; K=64; model trained per K
+epochs,Training epochs,10,epochs,"{""samples"":5001,""epochs"":10,""hidden"":8,""k"":4}",1,408.457,396.615,408.457,403.173,403.315,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,10,epochs,"{""samples"":5001,""epochs"":10,""hidden"":8,""k"":4}",2,400.435,396.615,408.457,403.173,403.315,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,10,epochs,"{""samples"":5001,""epochs"":10,""hidden"":8,""k"":4}",3,396.615,396.615,408.457,403.173,403.315,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,10,epochs,"{""samples"":5001,""epochs"":10,""hidden"":8,""k"":4}",4,403.315,396.615,408.457,403.173,403.315,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,10,epochs,"{""samples"":5001,""epochs"":10,""hidden"":8,""k"":4}",5,407.043,396.615,408.457,403.173,403.315,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,25,epochs,"{""samples"":5001,""epochs"":25,""hidden"":8,""k"":4}",1,1005.685,986.701,1057.379,1017.856,1015.422,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,25,epochs,"{""samples"":5001,""epochs"":25,""hidden"":8,""k"":4}",2,1057.379,986.701,1057.379,1017.856,1015.422,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,25,epochs,"{""samples"":5001,""epochs"":25,""hidden"":8,""k"":4}",3,986.701,986.701,1057.379,1017.856,1015.422,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,25,epochs,"{""samples"":5001,""epochs"":25,""hidden"":8,""k"":4}",4,1015.422,986.701,1057.379,1017.856,1015.422,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,25,epochs,"{""samples"":5001,""epochs"":25,""hidden"":8,""k"":4}",5,1024.093,986.701,1057.379,1017.856,1015.422,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,50,epochs,"{""samples"":5001,""epochs"":50,""hidden"":8,""k"":4}",1,2055.602,2025.958,2069.168,2052.617,2055.602,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,50,epochs,"{""samples"":5001,""epochs"":50,""hidden"":8,""k"":4}",2,2059.29,2025.958,2069.168,2052.617,2055.602,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,50,epochs,"{""samples"":5001,""epochs"":50,""hidden"":8,""k"":4}",3,2069.168,2025.958,2069.168,2052.617,2055.602,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,50,epochs,"{""samples"":5001,""epochs"":50,""hidden"":8,""k"":4}",4,2053.065,2025.958,2069.168,2052.617,2055.602,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,50,epochs,"{""samples"":5001,""epochs"":50,""hidden"":8,""k"":4}",5,2025.958,2025.958,2069.168,2052.617,2055.602,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,100,epochs,"{""samples"":5001,""epochs"":100,""hidden"":8,""k"":4}",1,4131.315,4064.605,4144.665,4111.259,4124.323,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,100,epochs,"{""samples"":5001,""epochs"":100,""hidden"":8,""k"":4}",2,4091.389,4064.605,4144.665,4111.259,4124.323,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,100,epochs,"{""samples"":5001,""epochs"":100,""hidden"":8,""k"":4}",3,4064.605,4064.605,4144.665,4111.259,4124.323,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,100,epochs,"{""samples"":5001,""epochs"":100,""hidden"":8,""k"":4}",4,4124.323,4064.605,4144.665,4111.259,4124.323,S=5000; K=4; trainPath=main-thread
+epochs,Training epochs,100,epochs,"{""samples"":5001,""epochs"":100,""hidden"":8,""k"":4}",5,4144.665,4064.605,4144.665,4111.259,4124.323,S=5000; K=4; trainPath=main-thread
+worker-main,Worker vs main thread,worker/main,ms,"{""paths"":[""worker"",""main-thread""],""samples"":5000,""epochs"":20,""k"":4}",,,,,,,skipped: Worker unavailable (Node)
