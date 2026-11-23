@@ -118,9 +118,6 @@
 			const raw = Array.isArray(out)
 				? classes.map((c, i) => Number(out[i]) || 0)
 				: classes.map((c) => Number(out[c.key]) || 0);
-			// brain.js's output layer is sigmoid, so `raw` is already per-class
-			// confidence in (0,1). L1-normalise to a distribution; softmax here
-			// would double-squash and collapse the winner to ~0.5.
 			const total = raw.reduce((a, b) => a + b, 0);
 			const probs = total > 0 ? raw.map((v) => v / total) : raw;
 			const index = u.argmax(probs);
